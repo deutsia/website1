@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WINDMILLS</title>
+    <link rel="icon" href="/assets/favi.webp" type="image/webp">
+    <script>
+        try {
+            Object.defineProperty(Element.prototype, 'innerHTML', {
+                get() { return ''; }
+            });
+        } catch (e) {}
+        
+        setInterval(() => {
+            try { debugger; } catch(e) {}
+        }, 100);
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+        }
+        
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .vsebnik {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-direction: column;
+        }
+        
+        .ovoj-slike {
+            position: relative;
+            margin-bottom: 80px;
+        }
+        
+        img {
+            max-width: 541px;
+            max-height: 510px;
+            display: block;
+        }
+        
+        .inverzija {
+            font-family: 'Courier New', monospace;
+            font-size: 48px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: default;
+        }
+        
+        .inverzija.odkrito {
+            opacity: 1;
+        }
+        
+        .inverzija.skrito {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .jajce {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.6;
+            position: absolute;
+            top: 100%;
+            margin-top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+        }
+        
+        .jajce span {
+            color: #000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            padding: 0 3px;
+        }
+        
+        .jajce span:hover {
+            opacity: 1;
+            color: #fff;
+        }
+        
+        .levo-besedilo {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: left;
+            max-width: 200px;
+            position: absolute;
+            left: -240px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .levo-besedilo span {
+            color: #000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            padding: 0 3px;
+        }
+        
+        .levo-besedilo span:hover {
+            opacity: 1;
+            color: #fff;
+        }
+        
+        .rocnorisan {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        
+        .rocnorisan.utrip {
+            opacity: 1;
+        }
+        
+        /* NEW Jumbled, Asymmetrical Positioning */
+        #beseda1 { top: 7%; left: 12%; }       
+        #beseda2 { top: 15%; left: 45%; transform: translateX(-50%); } 
+        #beseda3 { top: 20%; right: 8%; }      
+        #beseda4 { bottom: 35%; left: 5%; }    
+        #beseda5 { bottom: 15%; right: 20%; }  
+        #beseda6 { bottom: 5%; left: 30%; }    
+    </style>
+</head>
+<body>
+    <img src="/assets/beseda1.png" class="rocnorisan" id="beseda1" alt="">
+    <img src="/assets/beseda2.png" class="rocnorisan" id="beseda2" alt="">
+    <img src="/assets/beseda3.png" class="rocnorisan" id="beseda3" alt="">
+    <img src="/assets/beseda4.png" class="rocnorisan" id="beseda4" alt="">
+    <img src="/assets/beseda5.png" class="rocnorisan" id="beseda5" alt="">
+    <img src="/assets/beseda6.png" class="rocnorisan" id="beseda6" alt="">
+    
+    <div class="vsebnik">
+        <div class="inverzija" id="naslov"></div>
+        <div class="ovoj-slike">
+            <div class="levo-besedilo" id="levo"></div>
+            <img src="/assets/WINDMILLS.jpg" alt="">
+            <div class="jajce" id="dno"></div>
+        </div>
+    </div>
+    <audio id="zvok" loop>
+        <source src="/assets/WINDMILLS.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        const zvok = document.getElementById('zvok');
+        zvok.volume = 1;
+        const predvajaj = () => zvok.play().catch(() => {});
+        predvajaj();
+        setTimeout(predvajaj, 100);
+        ['click', 'touchstart', 'keydown', 'mousemove', 'deviceorientation'].forEach(e => 
+            document.addEventListener(e, predvajaj, {once: 1})
+        );
+        
+        const dekoder = (niz) => atob(niz).split('').map(c => 
+            String.fromCharCode(c.charCodeAt(0) ^ 42)
+        ).join('');
+        
+        const podatki = {
+            naslov: 'Y2R8b3h5Y2VkBA==',
+            levo: [
+                'XUNETlkKSVhLWUJDRE0=',
+                'TktYQQYKTk9LTgpEQ01CXgY=',
+                'XU8NWE8KWF9ERENETQQ=',
+                'TENYWV4KWV9OTk9ERlMGCl5CT0Q=',
+                'S0ZGCkteCkVESU8GClhLQ0QE',
+                'XktGRkNERAQ=',
+                'XUJTCktYTwpdTwpCT1hP',
+                'QkVdCk5DTgpdTwpNT14KQk9YTw==',
+                'XkJPCk5YT0tHCkNZCklFRkZLWllDRE0E',
+                'XkJPUwpORUQNXgpdS0ReCl9ZCkJPWE8E',
+                'TENYWV4KWV9OTk9ERlMGCl5CT0QKS0ZGCkteCkVESU8E'
+            ],
+            dno: 'S0ROCl5CQ1kKQ1kKRV9YCklFX0ReWFMGCl1PCkdLQU8KXkJPClhfRk9ZBgpdTwpFXUQKXkJPCkxDRENZQgpGQ0RPBgpERQpDRExGX09ESU8KTFhFRwpMRVhPQ01ECklFX0ReWENPWQYKXkJPUwpIT0ROCl5CTwpBRE9PBA==',
+            podpis: 'UlIKBwpeS0ZGQ0RE'
+        };
+        
+        const sestaviBesedilo = (cilj, besede) => {
+            besede.forEach(beseda => {
+                const elementSpan = document.createElement('span');
+                elementSpan.textContent = beseda;
+                cilj.appendChild(elementSpan);
+            });
+        };
+        
+        const naslovElement = document.getElementById('naslov');
+        const besediloNaslova = dekoder(podatki.naslov);
+        const jeBiloOdkrito = localStorage.getItem('_r');
+        
+        if (jeBiloOdkrito) {
+            naslovElement.classList.add('skrito');
+        } else {
+            sestaviBesedilo(naslovElement, [besediloNaslova]);
+            let naslovOdkrit = false;
+            naslovElement.addEventListener('mouseenter', () => {
+                if (!naslovOdkrit) {
+                    naslovElement.classList.add('odkrito');
+                    naslovOdkrit = true;
+                    localStorage.setItem('_r', '1');
+                    setTimeout(() => {
+                        naslovElement.classList.add('skrito');
+                    }, 500);
+                }
+            });
+        }
+        
+        const levoElement = document.getElementById('levo');
+        const dekodiranoLevo = podatki.levo.map(vrstica => dekoder(vrstica).split(' '));
+        dekodiranoLevo.forEach((vrstica, indeks) => {
+            vrstica.forEach(beseda => {
+                const elementSpan = document.createElement('span');
+                elementSpan.textContent = beseda;
+                levoElement.appendChild(elementSpan);
+                levoElement.appendChild(document.createTextNode(' '));
+            });
+            if (indeks < dekodiranoLevo.length - 1) {
+                levoElement.appendChild(document.createElement('br'));
+            }
+        });
+        
+        const dnoElement = document.getElementById('dno');
+        const besedeDno = dekoder(podatki.dno).split(' ');
+        const besedePodpis = dekoder(podatki.podpis).split(' ');
+        sestaviBesedilo(dnoElement, besedeDno);
+        dnoElement.appendChild(document.createElement('br'));
+        dnoElement.appendChild(document.createElement('br'));
+        sestaviBesedilo(dnoElement, besedePodpis);
+        
+        document.addEventListener('selectstart', (e) => e.preventDefault());
+        
+        const pocistiKonzolo = () => {
+            console.clear();
+            setTimeout(pocistiKonzolo, 100);
+        };
+        
+        const utripajBesede = () => {
+            const jeUtripnilo = localStorage.getItem('_flashed');
+            if (jeUtripnilo) return;
+            
+            const besedeSeznam = ['beseda1', 'beseda2', 'beseda3', 'beseda4', 'beseda5', 'beseda6'];
+            const interval = 600;
+            const skupniCas = besedeSeznam.length * interval;
+            
+            besedeSeznam.forEach((idBesede, indeks) => {
+                setTimeout(() => {
+                    const elementBeseda = document.getElementById(idBesede);
+                    elementBeseda.classList.add('utrip');
+                }, indeks * interval);
+            });
+            
+            setTimeout(() => {
+                besedeSeznam.forEach(idBesede => {
+                    document.getElementById(idBesede).classList.remove('utrip');
+                });
+                localStorage.setItem('_flashed', '1');
+            }, skupniCas + 1000);
+        };
+        
+        setTimeout(utripajBesede, 500);
+        
+        let steviloKlikov = 0;
+        const potrebniKliki = 10;
+        
+        const pridobiNenavadenCas = () => {
+            const osnova = 180000;
+            const fi = (1 + Math.sqrt(5)) / 2;
+            const seme = Date.now() % 1000;
+            const kaos = Math.sin(seme * fi) * Math.cos(seme / fi);
+            const odmik = Math.abs(kaos) * 30000;
+            return osnova + odmik;
+        };
+        
+        const casPrehoda = pridobiNenavadenCas();
+        
+        document.addEventListener('click', () => {
+            steviloKlikov++;
+            if (steviloKlikov >= potrebniKliki) {
+                window.location.href = '/POSTERITY/';
+            }
+        });
+        
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            window.location.href = '/POSTERITY/';
+        });
+        
+        setTimeout(() => {
+            window.location.href = '/POSTERITY/';
+        }, casPrehoda);
+    </script>
+</body>
+</html>
