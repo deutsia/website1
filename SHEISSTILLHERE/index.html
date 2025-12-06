@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S/HE IS STILL HER/E</title>
+    <link rel="icon" type="image/webp" href="../assets/favi.webp">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .title {
+            position: absolute;
+            top: 48px;
+            font-size: 14px;
+            letter-spacing: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .title.visible {
+            opacity: 1;
+        }
+
+        .visualizer-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle {
+            width: 120px;
+            height: 120px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+            position: relative;
+        }
+
+        .circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .circle.bass-drop {
+            animation: glitch 0.15s ease;
+        }
+
+        @keyframes glitch {
+            0% { transform: scale(1) translate(0, 0); filter: blur(0); }
+            20% { transform: scale(1.8) translate(-3px, 2px); filter: blur(1px); }
+            40% { transform: scale(1.6) translate(3px, -2px); filter: blur(0); }
+            60% { transform: scale(2) translate(-2px, -1px); filter: blur(2px); }
+            80% { transform: scale(1.4) translate(2px, 1px); filter: blur(0); }
+            100% { transform: scale(1) translate(0, 0); filter: blur(0); }
+        }
+
+        .whisper {
+            position: absolute;
+            font-size: 11px;
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .whisper.visible {
+            opacity: 0.7;
+        }
+
+        .whisper.fade {
+            opacity: 0;
+        }
+
+        .upload-hint {
+            position: absolute;
+            bottom: 48px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            opacity: 0.4;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-hint:hover {
+            opacity: 1;
+        }
+
+        .upload-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #audioInput {
+            display: none;
+        }
+
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .screen-flash.flash {
+            animation: screenFlash 0.1s ease;
+        }
+
+        @keyframes screenFlash {
+            0% { opacity: 0; }
+            50% { opacity: 0.15; }
+            100% { opacity: 0; }
+        }
+
+        .static-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.03) 2px,
+                rgba(255, 255, 255, 0.03) 4px
+            );
+        }
+
+        .static-overlay.active {
+            animation: staticNoise 0.2s steps(3);
+        }
+
+        @keyframes staticNoise {
+            0% { opacity: 0; }
+            25% { opacity: 0.5; }
+            50% { opacity: 0.2; }
+            75% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+
+        .drag-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .drag-overlay.active {
+            display: flex;
+        }
+
+        .drag-text {
+            font-size: 12px;
+            letter-spacing: 4px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">S/HE IS STILL HER/E</div>
+
+        <div class="visualizer-container">
+            <div class="circle"></div>
+        </div>
+
+        <div class="upload-hint">drop audio or click</div>
+    </div>
+
+    <div class="screen-flash"></div>
+    <div class="static-overlay"></div>
+    <div class="drag-overlay">
+        <span class="drag-text">release</span>
+    </div>
+
+    <input type="file" id="audioInput" accept="audio/*">
+    <audio id="audio" crossorigin="anonymous"></audio>
+
+    <script>
+        const whispers = [
+            'still here',
+            'watching',
+            'listening',
+            'waiting',
+            'remember',
+            'forgotten',
+            'beneath',
+            'between',
+            'always',
+            'never',
+            'echo',
+            'hollow',
+            'remain',
+            'fade',
+            'linger'
+        ];
+
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let audio = document.getElementById('audio');
+        let circle = document.querySelector('.circle');
+        let title = document.querySelector('.title');
+        let uploadHint = document.querySelector('.upload-hint');
+        let screenFlash = document.querySelector('.screen-flash');
+        let staticOverlay = document.querySelector('.static-overlay');
+        let dragOverlay = document.querySelector('.drag-overlay');
+        let audioInput = document.getElementById('audioInput');
+        let container = document.querySelector('.container');
+
+        let isPlaying = false;
+        let lastBassHit = 0;
+        let bassThreshold = 200;
+        let bassDropThreshold = 240;
+        let prevBassLevel = 0;
+
+        // Show title on first hover
+        let titleShown = false;
+        document.addEventListener('mousemove', () => {
+            if (!titleShown) {
+                title.classList.add('visible');
+                titleShown = true;
+                setTimeout(() => {
+                    title.classList.remove('visible');
+                }, 3000);
+            }
+        });
+
+        // File input handling
+        uploadHint.addEventListener('click', () => {
+            audioInput.click();
+        });
+
+        audioInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                loadAudio(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragOverlay.classList.add('active');
+        });
+
+        document.addEventListener('dragleave', (e) => {
+            if (e.relatedTarget === null) {
+                dragOverlay.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragOverlay.classList.remove('active');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                loadAudio(file);
+            }
+        });
+
+        function loadAudio(file) {
+            const url = URL.createObjectURL(file);
+            audio.src = url;
+
+            if (!audioContext) {
+                initAudio();
+            }
+
+            audio.play().then(() => {
+                isPlaying = true;
+                uploadHint.classList.add('hidden');
+                title.classList.add('visible');
+            });
+        }
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!isPlaying || !analyser) return;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // Get bass frequencies (first ~10 bins, roughly 0-400Hz)
+            let bassSum = 0;
+            for (let i = 0; i < 10; i++) {
+                bassSum += dataArray[i];
+            }
+            let bassLevel = bassSum / 10;
+
+            // Scale circle based on bass
+            let scale = 1 + (bassLevel / 255) * 0.8;
+            let glow = Math.floor((bassLevel / 255) * 20);
+
+            circle.style.transform = `scale(${scale})`;
+            circle.style.boxShadow = `0 0 ${glow}px rgba(255, 255, 255, ${bassLevel / 255 * 0.5})`;
+
+            // Detect bass drop (sudden spike)
+            const now = Date.now();
+            const bassJump = bassLevel - prevBassLevel;
+
+            if (bassLevel > bassDropThreshold && bassJump > 60 && now - lastBassHit > 300) {
+                triggerBassEffect();
+                lastBassHit = now;
+            }
+
+            prevBassLevel = bassLevel;
+        }
+
+        function triggerBassEffect() {
+            // Circle glitch
+            circle.classList.add('bass-drop');
+            setTimeout(() => circle.classList.remove('bass-drop'), 150);
+
+            // Screen flash
+            screenFlash.classList.add('flash');
+            setTimeout(() => screenFlash.classList.remove('flash'), 100);
+
+            // Static overlay
+            staticOverlay.classList.add('active');
+            setTimeout(() => staticOverlay.classList.remove('active'), 200);
+
+            // Random whisper
+            if (Math.random() > 0.5) {
+                spawnWhisper();
+            }
+        }
+
+        function spawnWhisper() {
+            const whisper = document.createElement('div');
+            whisper.className = 'whisper';
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+
+            // Random position around the circle
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 80;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+
+            whisper.style.left = `calc(50% + ${x}px)`;
+            whisper.style.top = `calc(50% + ${y}px)`;
+            whisper.style.transform = `translate(-50%, -50%) rotate(${(Math.random() - 0.5) * 20}deg)`;
+
+            container.appendChild(whisper);
+
+            // Fade in
+            setTimeout(() => whisper.classList.add('visible'), 50);
+
+            // Fade out and remove
+            setTimeout(() => {
+                whisper.classList.add('fade');
+                whisper.classList.remove('visible');
+                setTimeout(() => whisper.remove(), 800);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        // Handle audio end
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            title.classList.remove('visible');
+            uploadHint.classList.remove('hidden');
+        });
+
+        // Pause/play on space
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && audio.src) {
+                e.preventDefault();
+                if (audio.paused) {
+                    audio.play();
+                    isPlaying = true;
+                } else {
+                    audio.pause();
+                    isPlaying = false;
+                }
+            }
+        });
+
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
