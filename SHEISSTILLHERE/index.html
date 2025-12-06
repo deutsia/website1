@@ -18,9 +18,53 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #000;
             font-family: 'Courier New', monospace;
-            color: #fff;
+        }
+
+        body {
+            background: linear-gradient(180deg,
+                #1a1a2e 0%,
+                #16213e 30%,
+                #1a1a2e 60%,
+                #0f0f1a 100%
+            );
+            color: rgba(255, 255, 255, 0.8);
+            transition: background 0.8s ease, color 0.8s ease;
+        }
+
+        body.storm {
+            background: linear-gradient(180deg,
+                #0a0000 0%,
+                #1a0505 30%,
+                #2d0a0a 50%,
+                #0a0000 100%
+            );
+            color: #c6181a;
+        }
+
+        .sky-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 60% at 50% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            transition: opacity 0.8s ease, filter 0.8s ease;
+        }
+
+        body.storm .sky-layer {
+            opacity: 0.3;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(198,24,26,0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(139,0,0,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 60% at 50% 80%, rgba(198,24,26,0.1) 0%, transparent 50%);
+            filter: blur(20px);
         }
 
         .container {
@@ -31,6 +75,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            z-index: 10;
         }
 
         .title {
@@ -39,11 +84,16 @@
             font-size: 14px;
             letter-spacing: 4px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.5s ease;
         }
 
         .title.visible {
-            opacity: 1;
+            opacity: 0.8;
+        }
+
+        body.storm .title {
+            color: #c6181a;
+            text-shadow: 0 0 20px rgba(198,24,26,0.5);
         }
 
         .visualizer-container {
@@ -56,9 +106,9 @@
         .circle {
             width: 120px;
             height: 120px;
-            border: 1px solid #fff;
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 50%;
-            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+            transition: transform 0.08s ease-out, border-color 0.8s ease, box-shadow 0.8s ease;
             position: relative;
         }
 
@@ -70,11 +120,38 @@
             transform: translate(-50%, -50%);
             width: 4px;
             height: 4px;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
-            opacity: 0.6;
+            transition: background 0.8s ease, box-shadow 0.8s ease;
         }
 
+        body.storm .circle {
+            border-color: #c6181a;
+            box-shadow:
+                0 0 60px rgba(198,24,26,0.6),
+                0 0 120px rgba(198,24,26,0.3),
+                inset 0 0 30px rgba(198,24,26,0.2);
+        }
+
+        body.storm .circle::before {
+            background: #c6181a;
+            box-shadow: 0 0 20px rgba(198,24,26,0.8);
+        }
+
+        .love-text {
+            position: fixed;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+            white-space: nowrap;
+            transition: color 0.8s ease, opacity 0.8s ease, text-shadow 0.8s ease;
+        }
+
+        body.storm .love-text {
+            color: rgba(198, 24, 26, 0.4);
+            text-shadow: 0 0 10px rgba(198,24,26,0.3);
+        }
 
         .whisper {
             position: absolute;
@@ -90,8 +167,9 @@
             opacity: 0.7;
         }
 
-        .whisper.fade {
-            opacity: 0;
+        body.storm .whisper {
+            color: #c6181a;
+            text-shadow: 0 0 10px rgba(198,24,26,0.5);
         }
 
         .upload-hint {
@@ -99,13 +177,13 @@
             bottom: 48px;
             font-size: 11px;
             letter-spacing: 2px;
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: pointer;
             transition: opacity 0.3s ease;
         }
 
         .upload-hint:hover {
-            opacity: 1;
+            opacity: 0.8;
         }
 
         .upload-hint.hidden {
@@ -117,56 +195,37 @@
             display: none;
         }
 
-        .screen-flash {
+        .red-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #fff;
+            background: radial-gradient(ellipse at center, rgba(198,24,26,0.3) 0%, rgba(10,0,0,0.8) 100%);
             opacity: 0;
             pointer-events: none;
-            z-index: 100;
+            z-index: 5;
+            transition: opacity 0.5s ease;
         }
 
-        .screen-flash.flash {
-            animation: screenFlash 0.1s ease;
+        body.storm .red-overlay {
+            opacity: 1;
         }
 
-        @keyframes screenFlash {
-            0% { opacity: 0; }
-            50% { opacity: 0.15; }
-            100% { opacity: 0; }
-        }
-
-        .static-overlay {
+        .vignette {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
             pointer-events: none;
-            z-index: 50;
-            opacity: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(255, 255, 255, 0.03) 2px,
-                rgba(255, 255, 255, 0.03) 4px
-            );
+            z-index: 6;
+            transition: background 0.8s ease;
         }
 
-        .static-overlay.active {
-            animation: staticNoise 0.2s steps(3);
-        }
-
-        @keyframes staticNoise {
-            0% { opacity: 0; }
-            25% { opacity: 0.5; }
-            50% { opacity: 0.2; }
-            75% { opacity: 0.8; }
-            100% { opacity: 0; }
+        body.storm .vignette {
+            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.8) 100%);
         }
 
         .drag-overlay {
@@ -193,143 +252,69 @@
             opacity: 0.6;
         }
 
-        .love-text {
+        .silhouette {
             position: fixed;
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: #c6181a;
-            opacity: 0.08;
-            pointer-events: none;
-            white-space: nowrap;
-            transition: opacity 0.5s ease;
-        }
-
-        .love-text.pulse {
-            animation: lovePulse 0.4s ease;
-        }
-
-        @keyframes lovePulse {
-            0% { opacity: 0.08; }
-            50% { opacity: 0.6; }
-            100% { opacity: 0.08; }
-        }
-
-        .circle.bass-drop {
-            animation: glitchIntense 0.25s ease;
-        }
-
-        @keyframes glitchIntense {
-            0% {
-                transform: scale(1) translate(0, 0) rotate(0deg);
-                filter: blur(0);
-                border-color: #fff;
-            }
-            10% {
-                transform: scale(2.5) translate(-5px, 3px) rotate(5deg);
-                filter: blur(3px);
-                border-color: #c6181a;
-            }
-            20% {
-                transform: scale(0.5) translate(8px, -5px) rotate(-10deg);
-                filter: blur(0);
-                border-color: #fff;
-            }
-            30% {
-                transform: scale(3) translate(-3px, -8px) rotate(15deg);
-                filter: blur(5px);
-                border-color: #c6181a;
-            }
-            40% {
-                transform: scale(1.2) translate(6px, 4px) rotate(-5deg);
-                filter: blur(1px);
-                border-color: #fff;
-            }
-            50% {
-                transform: scale(2.8) translate(-10px, 2px) rotate(8deg);
-                filter: blur(4px);
-                border-color: #c6181a;
-                box-shadow: 0 0 60px rgba(198, 24, 26, 0.8);
-            }
-            60% {
-                transform: scale(0.8) translate(4px, -6px) rotate(-12deg);
-                filter: blur(0);
-                border-color: #fff;
-            }
-            70% {
-                transform: scale(2.2) translate(-7px, 5px) rotate(3deg);
-                filter: blur(2px);
-                border-color: #c6181a;
-            }
-            85% {
-                transform: scale(1.5) translate(2px, -2px) rotate(-2deg);
-                filter: blur(1px);
-                border-color: #fff;
-            }
-            100% {
-                transform: scale(1) translate(0, 0) rotate(0deg);
-                filter: blur(0);
-                border-color: #fff;
-            }
-        }
-
-        .circle.shatter {
-            animation: shatter 0.3s ease;
-        }
-
-        @keyframes shatter {
-            0% {
-                clip-path: circle(50%);
-                transform: scale(1);
-            }
-            25% {
-                clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-                transform: scale(2.5) rotate(30deg);
-            }
-            50% {
-                clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-                transform: scale(0.3) rotate(-45deg);
-            }
-            75% {
-                clip-path: polygon(50% 0%, 80% 30%, 100% 50%, 80% 70%, 50% 100%, 20% 70%, 0% 50%, 20% 30%);
-                transform: scale(3) rotate(60deg);
-            }
-            100% {
-                clip-path: circle(50%);
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        .circle-ghost {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border: 1px solid #c6181a;
-            border-radius: 50%;
-            pointer-events: none;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 250px;
             opacity: 0;
+            pointer-events: none;
+            z-index: 8;
+            transition: opacity 1.5s ease;
         }
 
-        .circle-ghost.active {
-            animation: ghostExpand 0.8s ease-out forwards;
+        .silhouette::before,
+        .silhouette::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 180px;
+            background: #000;
+            border-radius: 30px 30px 0 0;
         }
 
-        @keyframes ghostExpand {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(4);
-                opacity: 0;
-            }
+        .silhouette::before {
+            left: 30px;
+            transform: rotate(-5deg);
         }
 
-        .invert {
-            filter: invert(1);
+        .silhouette::after {
+            right: 30px;
+            transform: rotate(5deg);
+        }
+
+        body.storm .silhouette {
+            opacity: 0.15;
+        }
+
+        .reflection {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(to bottom, transparent, rgba(198,24,26,0.1));
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 1s ease;
+        }
+
+        body.storm .reflection {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
+    <div class="sky-layer"></div>
+    <div class="red-overlay"></div>
+    <div class="vignette"></div>
+    <div class="reflection"></div>
+    <div class="silhouette"></div>
+
     <div class="container">
         <div class="title">S/HE IS STILL HER/E</div>
 
@@ -340,8 +325,6 @@
         <div class="upload-hint">drop audio or click</div>
     </div>
 
-    <div class="screen-flash"></div>
-    <div class="static-overlay"></div>
     <div class="drag-overlay">
         <span class="drag-text">release</span>
     </div>
@@ -356,16 +339,11 @@
             'listening',
             'waiting',
             'remember',
-            'forgotten',
-            'beneath',
-            'between',
             'always',
             'never',
-            'echo',
-            'hollow',
             'remain',
-            'fade',
-            'linger'
+            'linger',
+            'together'
         ];
 
         const loveFragments = [
@@ -386,37 +364,42 @@
         let circle = document.querySelector('.circle');
         let title = document.querySelector('.title');
         let uploadHint = document.querySelector('.upload-hint');
-        let screenFlash = document.querySelector('.screen-flash');
-        let staticOverlay = document.querySelector('.static-overlay');
         let dragOverlay = document.querySelector('.drag-overlay');
         let audioInput = document.getElementById('audioInput');
         let container = document.querySelector('.container');
-        let visualizerContainer = document.querySelector('.visualizer-container');
 
         let isPlaying = false;
-        let lastBassHit = 0;
-        let bassThreshold = 80;
-        let bassDropThreshold = 100;
-        let prevBassLevel = 0;
-        let bassDropCount = 0;
         let loveTexts = [];
-        let isAnimating = false;
+
+        // Bass detection with rolling average
+        const bassHistory = [];
+        const bassHistoryLength = 30; // ~0.5 seconds of history at 60fps
+        let longTermBassAvg = 0;
+        let isInDrop = false;
+        let dropStartTime = 0;
+        let lastWhisperTime = 0;
+
+        // Thresholds
+        const DROP_ENTER_THRESHOLD = 1.8;  // Current bass must be 1.8x the long-term average
+        const DROP_EXIT_THRESHOLD = 1.2;   // Exit when bass drops below 1.2x average
+        const MIN_DROP_DURATION = 500;     // Minimum time in drop state (ms)
+        const SUB_BASS_BINS = 4;           // Only look at first 4 bins (~0-170Hz)
 
         // Scatter "in the name of love" across the page
         function createLoveTexts() {
             const positions = [
-                { x: 8, y: 12 },
-                { x: 75, y: 8 },
-                { x: 85, y: 35 },
-                { x: 5, y: 45 },
-                { x: 92, y: 60 },
-                { x: 12, y: 78 },
-                { x: 70, y: 85 },
-                { x: 35, y: 92 },
-                { x: 55, y: 5 },
-                { x: 3, y: 25 },
-                { x: 88, y: 88 },
-                { x: 25, y: 68 }
+                { x: 8, y: 15 },
+                { x: 78, y: 10 },
+                { x: 88, y: 40 },
+                { x: 5, y: 50 },
+                { x: 92, y: 65 },
+                { x: 10, y: 80 },
+                { x: 72, y: 88 },
+                { x: 38, y: 95 },
+                { x: 55, y: 8 },
+                { x: 3, y: 30 },
+                { x: 85, y: 85 },
+                { x: 22, y: 70 }
             ];
 
             positions.forEach((pos, i) => {
@@ -425,7 +408,7 @@
                 el.textContent = loveFragments[i % loveFragments.length];
                 el.style.left = pos.x + '%';
                 el.style.top = pos.y + '%';
-                el.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+                el.style.transform = `rotate(${(Math.random() - 0.5) * 25}deg)`;
                 document.body.appendChild(el);
                 loveTexts.push(el);
             });
@@ -496,7 +479,8 @@
         function initAudio() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
+            analyser.fftSize = 512; // More resolution for better bass detection
+            analyser.smoothingTimeConstant = 0.8;
 
             const source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
@@ -514,130 +498,62 @@
 
             analyser.getByteFrequencyData(dataArray);
 
-            // Get bass frequencies (first ~10 bins, roughly 0-400Hz)
-            let bassSum = 0;
-            for (let i = 0; i < 10; i++) {
-                bassSum += dataArray[i];
+            // Get SUB-BASS only (first few bins, ~20-170Hz with 512 FFT at 44.1kHz)
+            let subBassSum = 0;
+            for (let i = 0; i < SUB_BASS_BINS; i++) {
+                subBassSum += dataArray[i];
             }
-            let bassLevel = bassSum / 10;
+            let currentBass = subBassSum / SUB_BASS_BINS;
 
-            // Scale circle based on bass (only when not animating)
-            if (!isAnimating) {
-                let scale = 1 + (bassLevel / 255) * 0.8;
-                let glow = Math.floor((bassLevel / 255) * 20);
-
-                circle.style.transform = `scale(${scale})`;
-                circle.style.boxShadow = `0 0 ${glow}px rgba(255, 255, 255, ${bassLevel / 255 * 0.5})`;
+            // Update rolling history
+            bassHistory.push(currentBass);
+            if (bassHistory.length > bassHistoryLength) {
+                bassHistory.shift();
             }
 
-            // Detect bass drop (sudden spike or sustained high bass)
+            // Calculate long-term average (using full history)
+            if (bassHistory.length > 0) {
+                longTermBassAvg = bassHistory.reduce((a, b) => a + b, 0) / bassHistory.length;
+            }
+
+            // Scale circle based on current bass
+            let scale = 1 + (currentBass / 255) * 0.6;
+            circle.style.transform = `scale(${scale})`;
+
+            // Detect bass drop state changes
             const now = Date.now();
-            const bassJump = bassLevel - prevBassLevel;
+            const bassRatio = longTermBassAvg > 10 ? currentBass / longTermBassAvg : 0;
 
-            // Trigger on: big jump OR sustained high level
-            const isBassSpike = bassJump > 25;
-            const isHighBass = bassLevel > bassDropThreshold;
-            const cooldownPassed = now - lastBassHit > 250;
+            if (!isInDrop && bassRatio > DROP_ENTER_THRESHOLD && currentBass > 80) {
+                // Enter drop
+                enterDrop();
+                dropStartTime = now;
+            } else if (isInDrop) {
+                // Check if we should exit drop
+                const hasBeenInDropLongEnough = now - dropStartTime > MIN_DROP_DURATION;
+                const bassDroppedOff = bassRatio < DROP_EXIT_THRESHOLD || currentBass < 50;
 
-            if (isHighBass && isBassSpike && cooldownPassed) {
-                triggerBassEffect();
-                lastBassHit = now;
-            }
+                if (hasBeenInDropLongEnough && bassDroppedOff) {
+                    exitDrop();
+                }
 
-            prevBassLevel = bassLevel;
-        }
-
-        function triggerBassEffect() {
-            bassDropCount++;
-            isAnimating = true;
-
-            // Clear any existing inline transform so animation can take over
-            circle.style.transform = '';
-            circle.style.boxShadow = '';
-
-            // Alternate between different intense effects
-            const effectType = bassDropCount % 4;
-
-            if (effectType === 0) {
-                // Intense glitch with color shift
-                circle.classList.add('bass-drop');
-                setTimeout(() => {
-                    circle.classList.remove('bass-drop');
-                    isAnimating = false;
-                }, 250);
-            } else if (effectType === 1) {
-                // Shatter effect
-                circle.classList.add('shatter');
-                setTimeout(() => {
-                    circle.classList.remove('shatter');
-                    isAnimating = false;
-                }, 300);
-            } else if (effectType === 2) {
-                // Double glitch
-                circle.classList.add('bass-drop');
-                setTimeout(() => {
-                    circle.classList.remove('bass-drop');
-                    setTimeout(() => {
-                        circle.classList.add('bass-drop');
-                        setTimeout(() => {
-                            circle.classList.remove('bass-drop');
-                            isAnimating = false;
-                        }, 250);
-                    }, 50);
-                }, 150);
-            } else {
-                // Ghost ring expansion with glitch
-                circle.classList.add('bass-drop');
-                spawnGhostRing();
-                setTimeout(() => {
-                    circle.classList.remove('bass-drop');
-                    isAnimating = false;
-                }, 250);
-            }
-
-            // Screen flash - sometimes red
-            if (Math.random() > 0.6) {
-                screenFlash.style.background = '#c6181a';
-            } else {
-                screenFlash.style.background = '#fff';
-            }
-            screenFlash.classList.add('flash');
-            setTimeout(() => screenFlash.classList.remove('flash'), 100);
-
-            // Static overlay
-            staticOverlay.classList.add('active');
-            setTimeout(() => staticOverlay.classList.remove('active'), 200);
-
-            // Pulse random love texts
-            const numToPulse = Math.floor(Math.random() * 4) + 2;
-            const shuffled = [...loveTexts].sort(() => Math.random() - 0.5);
-            shuffled.slice(0, numToPulse).forEach(el => {
-                el.classList.add('pulse');
-                setTimeout(() => el.classList.remove('pulse'), 400);
-            });
-
-            // Brief screen invert on intense drops
-            if (Math.random() > 0.8) {
-                document.body.classList.add('invert');
-                setTimeout(() => document.body.classList.remove('invert'), 80);
-            }
-
-            // Random whisper
-            if (Math.random() > 0.4) {
-                spawnWhisper();
+                // Spawn whispers during drop
+                if (now - lastWhisperTime > 800 && Math.random() > 0.7) {
+                    spawnWhisper();
+                    lastWhisperTime = now;
+                }
             }
         }
 
-        function spawnGhostRing() {
-            const ghost = document.createElement('div');
-            ghost.className = 'circle-ghost';
-            visualizerContainer.appendChild(ghost);
+        function enterDrop() {
+            isInDrop = true;
+            document.body.classList.add('storm');
+            title.classList.add('visible');
+        }
 
-            requestAnimationFrame(() => {
-                ghost.classList.add('active');
-            });
-
-            setTimeout(() => ghost.remove(), 800);
+        function exitDrop() {
+            isInDrop = false;
+            document.body.classList.remove('storm');
         }
 
         function spawnWhisper() {
@@ -647,13 +563,13 @@
 
             // Random position around the circle
             const angle = Math.random() * Math.PI * 2;
-            const distance = 100 + Math.random() * 80;
+            const distance = 100 + Math.random() * 100;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
 
             whisper.style.left = `calc(50% + ${x}px)`;
             whisper.style.top = `calc(50% + ${y}px)`;
-            whisper.style.transform = `translate(-50%, -50%) rotate(${(Math.random() - 0.5) * 20}deg)`;
+            whisper.style.transform = `translate(-50%, -50%) rotate(${(Math.random() - 0.5) * 15}deg)`;
 
             container.appendChild(whisper);
 
@@ -662,10 +578,9 @@
 
             // Fade out and remove
             setTimeout(() => {
-                whisper.classList.add('fade');
                 whisper.classList.remove('visible');
                 setTimeout(() => whisper.remove(), 800);
-            }, 1500 + Math.random() * 1000);
+            }, 2000 + Math.random() * 1000);
         }
 
         // Handle audio end
@@ -673,6 +588,7 @@
             isPlaying = false;
             title.classList.remove('visible');
             uploadHint.classList.remove('hidden');
+            exitDrop();
         });
 
         // Pause/play on space
