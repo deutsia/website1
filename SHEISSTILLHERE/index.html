@@ -75,18 +75,6 @@
             opacity: 0.6;
         }
 
-        .circle.bass-drop {
-            animation: glitch 0.15s ease;
-        }
-
-        @keyframes glitch {
-            0% { transform: scale(1) translate(0, 0); filter: blur(0); }
-            20% { transform: scale(1.8) translate(-3px, 2px); filter: blur(1px); }
-            40% { transform: scale(1.6) translate(3px, -2px); filter: blur(0); }
-            60% { transform: scale(2) translate(-2px, -1px); filter: blur(2px); }
-            80% { transform: scale(1.4) translate(2px, 1px); filter: blur(0); }
-            100% { transform: scale(1) translate(0, 0); filter: blur(0); }
-        }
 
         .whisper {
             position: absolute;
@@ -204,6 +192,141 @@
             letter-spacing: 4px;
             opacity: 0.6;
         }
+
+        .love-text {
+            position: fixed;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #c6181a;
+            opacity: 0.08;
+            pointer-events: none;
+            white-space: nowrap;
+            transition: opacity 0.5s ease;
+        }
+
+        .love-text.pulse {
+            animation: lovePulse 0.4s ease;
+        }
+
+        @keyframes lovePulse {
+            0% { opacity: 0.08; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.08; }
+        }
+
+        .circle.bass-drop {
+            animation: glitchIntense 0.25s ease;
+        }
+
+        @keyframes glitchIntense {
+            0% {
+                transform: scale(1) translate(0, 0) rotate(0deg);
+                filter: blur(0);
+                border-color: #fff;
+            }
+            10% {
+                transform: scale(2.5) translate(-5px, 3px) rotate(5deg);
+                filter: blur(3px);
+                border-color: #c6181a;
+            }
+            20% {
+                transform: scale(0.5) translate(8px, -5px) rotate(-10deg);
+                filter: blur(0);
+                border-color: #fff;
+            }
+            30% {
+                transform: scale(3) translate(-3px, -8px) rotate(15deg);
+                filter: blur(5px);
+                border-color: #c6181a;
+            }
+            40% {
+                transform: scale(1.2) translate(6px, 4px) rotate(-5deg);
+                filter: blur(1px);
+                border-color: #fff;
+            }
+            50% {
+                transform: scale(2.8) translate(-10px, 2px) rotate(8deg);
+                filter: blur(4px);
+                border-color: #c6181a;
+                box-shadow: 0 0 60px rgba(198, 24, 26, 0.8);
+            }
+            60% {
+                transform: scale(0.8) translate(4px, -6px) rotate(-12deg);
+                filter: blur(0);
+                border-color: #fff;
+            }
+            70% {
+                transform: scale(2.2) translate(-7px, 5px) rotate(3deg);
+                filter: blur(2px);
+                border-color: #c6181a;
+            }
+            85% {
+                transform: scale(1.5) translate(2px, -2px) rotate(-2deg);
+                filter: blur(1px);
+                border-color: #fff;
+            }
+            100% {
+                transform: scale(1) translate(0, 0) rotate(0deg);
+                filter: blur(0);
+                border-color: #fff;
+            }
+        }
+
+        .circle.shatter {
+            animation: shatter 0.3s ease;
+        }
+
+        @keyframes shatter {
+            0% {
+                clip-path: circle(50%);
+                transform: scale(1);
+            }
+            25% {
+                clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+                transform: scale(2.5) rotate(30deg);
+            }
+            50% {
+                clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+                transform: scale(0.3) rotate(-45deg);
+            }
+            75% {
+                clip-path: polygon(50% 0%, 80% 30%, 100% 50%, 80% 70%, 50% 100%, 20% 70%, 0% 50%, 20% 30%);
+                transform: scale(3) rotate(60deg);
+            }
+            100% {
+                clip-path: circle(50%);
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .circle-ghost {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 1px solid #c6181a;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .circle-ghost.active {
+            animation: ghostExpand 0.8s ease-out forwards;
+        }
+
+        @keyframes ghostExpand {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .invert {
+            filter: invert(1);
+        }
     </style>
 </head>
 <body>
@@ -245,6 +368,17 @@
             'linger'
         ];
 
+        const loveFragments = [
+            'in the name of love',
+            'in the name',
+            'of love',
+            'the name',
+            'love',
+            'name',
+            'in the',
+            'of'
+        ];
+
         let audioContext;
         let analyser;
         let dataArray;
@@ -257,12 +391,46 @@
         let dragOverlay = document.querySelector('.drag-overlay');
         let audioInput = document.getElementById('audioInput');
         let container = document.querySelector('.container');
+        let visualizerContainer = document.querySelector('.visualizer-container');
 
         let isPlaying = false;
         let lastBassHit = 0;
         let bassThreshold = 200;
         let bassDropThreshold = 240;
         let prevBassLevel = 0;
+        let bassDropCount = 0;
+        let loveTexts = [];
+
+        // Scatter "in the name of love" across the page
+        function createLoveTexts() {
+            const positions = [
+                { x: 8, y: 12 },
+                { x: 75, y: 8 },
+                { x: 85, y: 35 },
+                { x: 5, y: 45 },
+                { x: 92, y: 60 },
+                { x: 12, y: 78 },
+                { x: 70, y: 85 },
+                { x: 35, y: 92 },
+                { x: 55, y: 5 },
+                { x: 3, y: 25 },
+                { x: 88, y: 88 },
+                { x: 25, y: 68 }
+            ];
+
+            positions.forEach((pos, i) => {
+                const el = document.createElement('div');
+                el.className = 'love-text';
+                el.textContent = loveFragments[i % loveFragments.length];
+                el.style.left = pos.x + '%';
+                el.style.top = pos.y + '%';
+                el.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+                document.body.appendChild(el);
+                loveTexts.push(el);
+            });
+        }
+
+        createLoveTexts();
 
         // Show title on first hover
         let titleShown = false;
@@ -372,11 +540,42 @@
         }
 
         function triggerBassEffect() {
-            // Circle glitch
-            circle.classList.add('bass-drop');
-            setTimeout(() => circle.classList.remove('bass-drop'), 150);
+            bassDropCount++;
 
-            // Screen flash
+            // Alternate between different intense effects
+            const effectType = bassDropCount % 4;
+
+            if (effectType === 0) {
+                // Intense glitch with color shift
+                circle.classList.add('bass-drop');
+                setTimeout(() => circle.classList.remove('bass-drop'), 250);
+            } else if (effectType === 1) {
+                // Shatter effect
+                circle.classList.add('shatter');
+                setTimeout(() => circle.classList.remove('shatter'), 300);
+            } else if (effectType === 2) {
+                // Double glitch
+                circle.classList.add('bass-drop');
+                setTimeout(() => {
+                    circle.classList.remove('bass-drop');
+                    setTimeout(() => {
+                        circle.classList.add('bass-drop');
+                        setTimeout(() => circle.classList.remove('bass-drop'), 250);
+                    }, 50);
+                }, 150);
+            } else {
+                // Ghost ring expansion with glitch
+                circle.classList.add('bass-drop');
+                spawnGhostRing();
+                setTimeout(() => circle.classList.remove('bass-drop'), 250);
+            }
+
+            // Screen flash - sometimes red
+            if (Math.random() > 0.6) {
+                screenFlash.style.background = '#c6181a';
+            } else {
+                screenFlash.style.background = '#fff';
+            }
             screenFlash.classList.add('flash');
             setTimeout(() => screenFlash.classList.remove('flash'), 100);
 
@@ -384,10 +583,36 @@
             staticOverlay.classList.add('active');
             setTimeout(() => staticOverlay.classList.remove('active'), 200);
 
+            // Pulse random love texts
+            const numToPulse = Math.floor(Math.random() * 4) + 2;
+            const shuffled = [...loveTexts].sort(() => Math.random() - 0.5);
+            shuffled.slice(0, numToPulse).forEach(el => {
+                el.classList.add('pulse');
+                setTimeout(() => el.classList.remove('pulse'), 400);
+            });
+
+            // Brief screen invert on intense drops
+            if (Math.random() > 0.8) {
+                document.body.classList.add('invert');
+                setTimeout(() => document.body.classList.remove('invert'), 80);
+            }
+
             // Random whisper
-            if (Math.random() > 0.5) {
+            if (Math.random() > 0.4) {
                 spawnWhisper();
             }
+        }
+
+        function spawnGhostRing() {
+            const ghost = document.createElement('div');
+            ghost.className = 'circle-ghost';
+            visualizerContainer.appendChild(ghost);
+
+            requestAnimationFrame(() => {
+                ghost.classList.add('active');
+            });
+
+            setTimeout(() => ghost.remove(), 800);
         }
 
         function spawnWhisper() {
