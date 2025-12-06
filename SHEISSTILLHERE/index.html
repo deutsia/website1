@@ -23,13 +23,14 @@
 
         body {
             background: linear-gradient(180deg,
-                #1a1a2e 0%,
-                #16213e 30%,
-                #1a1a2e 60%,
-                #0f0f1a 100%
+                #87CEEB 0%,
+                #B0E0E6 25%,
+                #E0F6FF 50%,
+                #F5F5DC 85%,
+                #DEB887 100%
             );
-            color: rgba(255, 255, 255, 0.8);
-            transition: background 0.8s ease, color 0.8s ease;
+            color: rgba(60, 60, 80, 0.8);
+            transition: background 1.2s ease, color 1.2s ease;
         }
 
         body.storm {
@@ -42,29 +43,137 @@
             color: #c6181a;
         }
 
-        .sky-layer {
+        .clouds-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 60%;
+            overflow: hidden;
             pointer-events: none;
             z-index: 1;
-            opacity: 0.15;
-            background:
-                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(255,255,255,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse 90% 60% at 50% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
-            transition: opacity 0.8s ease, filter 0.8s ease;
         }
 
-        body.storm .sky-layer {
-            opacity: 0.3;
-            background:
-                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(198,24,26,0.2) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(139,0,0,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 90% 60% at 50% 80%, rgba(198,24,26,0.1) 0%, transparent 50%);
-            filter: blur(20px);
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.9;
+            transition: opacity 1.2s ease, filter 1.2s ease, background 1.2s ease;
+        }
+
+        body.storm .cloud {
+            background: #1a0808;
+            opacity: 0.6;
+            filter: blur(8px);
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 200px;
+            height: 60px;
+            top: 8%;
+            animation: drift-1 25s linear infinite;
+        }
+        .cloud-1::before { width: 100px; height: 50px; top: -25px; left: 20px; }
+        .cloud-1::after { width: 120px; height: 55px; top: -20px; left: 80px; }
+
+        .cloud-2 {
+            width: 150px;
+            height: 45px;
+            top: 18%;
+            animation: drift-2 35s linear infinite;
+            animation-delay: -10s;
+        }
+        .cloud-2::before { width: 80px; height: 40px; top: -20px; left: 15px; }
+        .cloud-2::after { width: 90px; height: 45px; top: -18px; left: 60px; }
+
+        .cloud-3 {
+            width: 250px;
+            height: 70px;
+            top: 5%;
+            animation: drift-3 40s linear infinite;
+            animation-delay: -20s;
+        }
+        .cloud-3::before { width: 130px; height: 60px; top: -30px; left: 30px; }
+        .cloud-3::after { width: 140px; height: 65px; top: -25px; left: 100px; }
+
+        .cloud-4 {
+            width: 180px;
+            height: 50px;
+            top: 25%;
+            animation: drift-1 30s linear infinite;
+            animation-delay: -5s;
+        }
+        .cloud-4::before { width: 90px; height: 45px; top: -22px; left: 25px; }
+        .cloud-4::after { width: 100px; height: 48px; top: -20px; left: 75px; }
+
+        .cloud-5 {
+            width: 160px;
+            height: 48px;
+            top: 12%;
+            animation: drift-2 28s linear infinite;
+            animation-delay: -15s;
+        }
+        .cloud-5::before { width: 85px; height: 42px; top: -21px; left: 18px; }
+        .cloud-5::after { width: 95px; height: 46px; top: -19px; left: 65px; }
+
+        .cloud-6 {
+            width: 220px;
+            height: 65px;
+            top: 3%;
+            animation: drift-3 32s linear infinite;
+            animation-delay: -8s;
+            opacity: 0.7;
+        }
+        .cloud-6::before { width: 110px; height: 55px; top: -28px; left: 28px; }
+        .cloud-6::after { width: 125px; height: 58px; top: -24px; left: 90px; }
+
+        @keyframes drift-1 {
+            from { left: -300px; }
+            to { left: 110%; }
+        }
+
+        @keyframes drift-2 {
+            from { left: -250px; }
+            to { left: 115%; }
+        }
+
+        @keyframes drift-3 {
+            from { left: -350px; }
+            to { left: 105%; }
+        }
+
+        .horizon {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(139, 119, 101, 0.1) 30%,
+                rgba(139, 119, 101, 0.2) 100%
+            );
+            pointer-events: none;
+            z-index: 2;
+            transition: background 1.2s ease;
+        }
+
+        body.storm .horizon {
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(198, 24, 26, 0.1) 30%,
+                rgba(10, 0, 0, 0.4) 100%
+            );
         }
 
         .container {
@@ -84,11 +193,12 @@
             font-size: 14px;
             letter-spacing: 4px;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, color 1.2s ease;
+            color: rgba(60, 60, 80, 0.9);
         }
 
         .title.visible {
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         body.storm .title {
@@ -106,10 +216,11 @@
         .circle {
             width: 120px;
             height: 120px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(60, 60, 80, 0.4);
             border-radius: 50%;
-            transition: transform 0.08s ease-out, border-color 0.8s ease, box-shadow 0.8s ease;
+            transition: transform 0.08s ease-out, border-color 1.2s ease, box-shadow 1.2s ease;
             position: relative;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .circle::before {
@@ -120,13 +231,14 @@
             transform: translate(-50%, -50%);
             width: 4px;
             height: 4px;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(60, 60, 80, 0.6);
             border-radius: 50%;
-            transition: background 0.8s ease, box-shadow 0.8s ease;
+            transition: background 1.2s ease, box-shadow 1.2s ease;
         }
 
         body.storm .circle {
             border-color: #c6181a;
+            background: rgba(198, 24, 26, 0.1);
             box-shadow:
                 0 0 60px rgba(198,24,26,0.6),
                 0 0 120px rgba(198,24,26,0.3),
@@ -142,14 +254,14 @@
             position: fixed;
             font-size: 10px;
             letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.04);
+            color: rgba(60, 60, 80, 0.06);
             pointer-events: none;
             white-space: nowrap;
-            transition: color 0.8s ease, opacity 0.8s ease, text-shadow 0.8s ease;
+            transition: color 1.2s ease, text-shadow 1.2s ease;
         }
 
         body.storm .love-text {
-            color: rgba(198, 24, 26, 0.4);
+            color: rgba(198, 24, 26, 0.5);
             text-shadow: 0 0 10px rgba(198,24,26,0.3);
         }
 
@@ -161,6 +273,7 @@
             transition: opacity 0.8s ease;
             pointer-events: none;
             white-space: nowrap;
+            color: rgba(60, 60, 80, 0.8);
         }
 
         .whisper.visible {
@@ -177,18 +290,23 @@
             bottom: 48px;
             font-size: 11px;
             letter-spacing: 2px;
-            opacity: 0.3;
+            opacity: 0.4;
             cursor: pointer;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, color 1.2s ease;
+            color: rgba(60, 60, 80, 0.8);
         }
 
         .upload-hint:hover {
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .upload-hint.hidden {
             opacity: 0;
             pointer-events: none;
+        }
+
+        body.storm .upload-hint {
+            color: rgba(198, 24, 26, 0.6);
         }
 
         #audioInput {
@@ -201,11 +319,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(ellipse at center, rgba(198,24,26,0.3) 0%, rgba(10,0,0,0.8) 100%);
+            background: radial-gradient(ellipse at center, rgba(198,24,26,0.2) 0%, rgba(10,0,0,0.85) 100%);
             opacity: 0;
             pointer-events: none;
             z-index: 5;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
         }
 
         body.storm .red-overlay {
@@ -218,14 +336,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
             pointer-events: none;
             z-index: 6;
-            transition: background 0.8s ease;
+            transition: background 1.2s ease;
         }
 
         body.storm .vignette {
-            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.85) 100%);
         }
 
         .drag-overlay {
@@ -234,8 +352,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(60, 60, 80, 0.2);
             display: none;
             align-items: center;
             justify-content: center;
@@ -250,11 +368,12 @@
             font-size: 12px;
             letter-spacing: 4px;
             opacity: 0.6;
+            color: rgba(60, 60, 80, 0.8);
         }
 
         .silhouette {
             position: fixed;
-            bottom: 10%;
+            bottom: 8%;
             left: 50%;
             transform: translateX(-50%);
             width: 200px;
@@ -287,7 +406,7 @@
         }
 
         body.storm .silhouette {
-            opacity: 0.15;
+            opacity: 0.2;
         }
 
         .reflection {
@@ -296,20 +415,47 @@
             left: 0;
             width: 100%;
             height: 20%;
-            background: linear-gradient(to bottom, transparent, rgba(198,24,26,0.1));
+            background: linear-gradient(to bottom, transparent, rgba(198,24,26,0.15));
             opacity: 0;
             pointer-events: none;
             z-index: 4;
-            transition: opacity 1s ease;
+            transition: opacity 1.2s ease;
         }
 
         body.storm .reflection {
             opacity: 1;
         }
+
+        /* Debug indicator - shows bass level */
+        .debug-bar {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            width: 200px;
+            height: 4px;
+            background: rgba(0,0,0,0.2);
+            z-index: 999;
+            display: none;
+        }
+
+        .debug-bar-fill {
+            height: 100%;
+            background: #c6181a;
+            width: 0%;
+            transition: width 0.05s;
+        }
     </style>
 </head>
 <body>
-    <div class="sky-layer"></div>
+    <div class="clouds-container">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+        <div class="cloud cloud-5"></div>
+        <div class="cloud cloud-6"></div>
+    </div>
+    <div class="horizon"></div>
     <div class="red-overlay"></div>
     <div class="vignette"></div>
     <div class="reflection"></div>
@@ -328,6 +474,8 @@
     <div class="drag-overlay">
         <span class="drag-text">release</span>
     </div>
+
+    <div class="debug-bar"><div class="debug-bar-fill"></div></div>
 
     <input type="file" id="audioInput" accept="audio/*">
     <audio id="audio" crossorigin="anonymous"></audio>
@@ -371,19 +519,29 @@
         let isPlaying = false;
         let loveTexts = [];
 
-        // Bass detection with rolling average
-        const bassHistory = [];
-        const bassHistoryLength = 30; // ~0.5 seconds of history at 60fps
-        let longTermBassAvg = 0;
+        // ===== NEW BASS DETECTION SYSTEM =====
+        // Uses a very slow-updating baseline vs current reading
+
+        let slowBaseline = 0;           // Very slow moving average (the "normal" level)
         let isInDrop = false;
         let dropStartTime = 0;
         let lastWhisperTime = 0;
+        let frameCount = 0;
 
-        // Thresholds
-        const DROP_ENTER_THRESHOLD = 1.8;  // Current bass must be 1.8x the long-term average
-        const DROP_EXIT_THRESHOLD = 1.2;   // Exit when bass drops below 1.2x average
-        const MIN_DROP_DURATION = 500;     // Minimum time in drop state (ms)
-        const SUB_BASS_BINS = 4;           // Only look at first 4 bins (~0-170Hz)
+        // Key insight: We need to track what "quiet" sounds like vs what "loud" sounds like
+        // The baseline should represent the quieter parts of the song
+
+        const BASELINE_RISE_RATE = 0.002;    // Baseline rises VERY slowly when bass is high
+        const BASELINE_FALL_RATE = 0.02;     // Baseline falls faster when bass is low
+        const DROP_THRESHOLD_MULTIPLIER = 2.5; // Need 2.5x baseline to trigger drop
+        const DROP_ABSOLUTE_MIN = 120;        // Minimum absolute bass level to trigger
+        const EXIT_THRESHOLD_MULTIPLIER = 1.5; // Exit when below 1.5x baseline
+        const MIN_DROP_DURATION = 800;        // Stay in drop for at least 800ms
+        const BUILDUP_WINDOW = 90;            // ~1.5 seconds at 60fps
+
+        // Buildup detection
+        let energyHistory = [];
+        let buildupDetected = false;
 
         // Scatter "in the name of love" across the page
         function createLoveTexts() {
@@ -469,6 +627,12 @@
                 initAudio();
             }
 
+            // Reset detection state for new track
+            slowBaseline = 0;
+            energyHistory = [];
+            buildupDetected = false;
+            isInDrop = false;
+
             audio.play().then(() => {
                 isPlaying = true;
                 uploadHint.classList.add('hidden');
@@ -479,8 +643,8 @@
         function initAudio() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 512; // More resolution for better bass detection
-            analyser.smoothingTimeConstant = 0.8;
+            analyser.fftSize = 2048;  // Higher resolution
+            analyser.smoothingTimeConstant = 0.4;  // Less smoothing for faster response
 
             const source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
@@ -491,58 +655,125 @@
             animate();
         }
 
+        function getSubBass() {
+            // With 2048 FFT at 44100Hz, each bin is ~21.5Hz
+            // Bins 1-4 cover roughly 21-86Hz (sub bass)
+            // Bin 0 is often DC offset, skip it
+            let sum = 0;
+            for (let i = 1; i <= 4; i++) {
+                sum += dataArray[i];
+            }
+            return sum / 4;
+        }
+
+        function getBass() {
+            // Bins 5-12 cover roughly 86-258Hz (bass)
+            let sum = 0;
+            for (let i = 5; i <= 12; i++) {
+                sum += dataArray[i];
+            }
+            return sum / 8;
+        }
+
+        function getMids() {
+            // Higher frequencies for detecting snares/hi-hats
+            let sum = 0;
+            for (let i = 20; i <= 60; i++) {
+                sum += dataArray[i];
+            }
+            return sum / 40;
+        }
+
         function animate() {
             requestAnimationFrame(animate);
 
             if (!isPlaying || !analyser) return;
 
             analyser.getByteFrequencyData(dataArray);
+            frameCount++;
 
-            // Get SUB-BASS only (first few bins, ~20-170Hz with 512 FFT at 44.1kHz)
-            let subBassSum = 0;
-            for (let i = 0; i < SUB_BASS_BINS; i++) {
-                subBassSum += dataArray[i];
-            }
-            let currentBass = subBassSum / SUB_BASS_BINS;
+            const subBass = getSubBass();
+            const bass = getBass();
+            const mids = getMids();
 
-            // Update rolling history
-            bassHistory.push(currentBass);
-            if (bassHistory.length > bassHistoryLength) {
-                bassHistory.shift();
-            }
+            // Combined low frequency energy (what we care about for drops)
+            const lowEnergy = (subBass * 2 + bass) / 3;  // Weight sub-bass more heavily
 
-            // Calculate long-term average (using full history)
-            if (bassHistory.length > 0) {
-                longTermBassAvg = bassHistory.reduce((a, b) => a + b, 0) / bassHistory.length;
+            // Update energy history for buildup detection
+            energyHistory.push(lowEnergy);
+            if (energyHistory.length > BUILDUP_WINDOW) {
+                energyHistory.shift();
             }
 
-            // Scale circle based on current bass
-            let scale = 1 + (currentBass / 255) * 0.6;
+            // Scale circle based on low energy
+            let scale = 1 + (lowEnergy / 255) * 0.7;
             circle.style.transform = `scale(${scale})`;
 
-            // Detect bass drop state changes
-            const now = Date.now();
-            const bassRatio = longTermBassAvg > 10 ? currentBass / longTermBassAvg : 0;
+            // Update baseline asymmetrically:
+            // - Rises very slowly when energy is high (so sustained bass doesn't raise it much)
+            // - Falls faster when energy is low (so it returns to "quiet" level)
+            if (lowEnergy > slowBaseline) {
+                slowBaseline += (lowEnergy - slowBaseline) * BASELINE_RISE_RATE;
+            } else {
+                slowBaseline += (lowEnergy - slowBaseline) * BASELINE_FALL_RATE;
+            }
 
-            if (!isInDrop && bassRatio > DROP_ENTER_THRESHOLD && currentBass > 80) {
-                // Enter drop
-                enterDrop();
-                dropStartTime = now;
-            } else if (isInDrop) {
+            // Don't let baseline go below a minimum
+            slowBaseline = Math.max(slowBaseline, 20);
+
+            // Detect buildup: energy steadily increasing over time
+            if (energyHistory.length >= BUILDUP_WINDOW) {
+                const firstHalf = energyHistory.slice(0, BUILDUP_WINDOW / 2);
+                const secondHalf = energyHistory.slice(BUILDUP_WINDOW / 2);
+                const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+
+                // Buildup detected if second half is significantly higher than first
+                buildupDetected = secondAvg > firstAvg * 1.3 && secondAvg > 60;
+            }
+
+            const now = Date.now();
+
+            // Calculate how much louder current bass is vs baseline
+            const bassRatio = lowEnergy / Math.max(slowBaseline, 1);
+
+            // Extra check: make sure it's actually bass, not just mids (snares)
+            // If mids are proportionally louder than bass, it's probably not a real drop
+            const isTrueBass = lowEnergy > mids * 0.8;
+
+            if (!isInDrop) {
+                // Enter drop conditions:
+                // 1. Bass ratio exceeds threshold OR we detected a buildup and now have high bass
+                // 2. Absolute bass level is high enough
+                // 3. It's actually bass, not snares
+                const ratioTrigger = bassRatio > DROP_THRESHOLD_MULTIPLIER;
+                const buildupTrigger = buildupDetected && lowEnergy > 100;
+                const absoluteTrigger = lowEnergy > DROP_ABSOLUTE_MIN;
+
+                if ((ratioTrigger || buildupTrigger) && absoluteTrigger && isTrueBass) {
+                    enterDrop();
+                    dropStartTime = now;
+                    buildupDetected = false;
+                }
+            } else {
                 // Check if we should exit drop
                 const hasBeenInDropLongEnough = now - dropStartTime > MIN_DROP_DURATION;
-                const bassDroppedOff = bassRatio < DROP_EXIT_THRESHOLD || currentBass < 50;
+                const bassDroppedOff = bassRatio < EXIT_THRESHOLD_MULTIPLIER && lowEnergy < 80;
 
                 if (hasBeenInDropLongEnough && bassDroppedOff) {
                     exitDrop();
                 }
 
                 // Spawn whispers during drop
-                if (now - lastWhisperTime > 800 && Math.random() > 0.7) {
+                if (now - lastWhisperTime > 600 && Math.random() > 0.6) {
                     spawnWhisper();
                     lastWhisperTime = now;
                 }
             }
+
+            // Debug: uncomment to see bass level
+            // document.querySelector('.debug-bar').style.display = 'block';
+            // document.querySelector('.debug-bar-fill').style.width = (lowEnergy / 255 * 100) + '%';
         }
 
         function enterDrop() {
