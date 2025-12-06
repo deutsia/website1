@@ -395,11 +395,12 @@
 
         let isPlaying = false;
         let lastBassHit = 0;
-        let bassThreshold = 200;
-        let bassDropThreshold = 240;
+        let bassThreshold = 80;
+        let bassDropThreshold = 100;
         let prevBassLevel = 0;
         let bassDropCount = 0;
         let loveTexts = [];
+        let isAnimating = false;
 
         // Scatter "in the name of love" across the page
         function createLoveTexts() {
@@ -520,18 +521,25 @@
             }
             let bassLevel = bassSum / 10;
 
-            // Scale circle based on bass
-            let scale = 1 + (bassLevel / 255) * 0.8;
-            let glow = Math.floor((bassLevel / 255) * 20);
+            // Scale circle based on bass (only when not animating)
+            if (!isAnimating) {
+                let scale = 1 + (bassLevel / 255) * 0.8;
+                let glow = Math.floor((bassLevel / 255) * 20);
 
-            circle.style.transform = `scale(${scale})`;
-            circle.style.boxShadow = `0 0 ${glow}px rgba(255, 255, 255, ${bassLevel / 255 * 0.5})`;
+                circle.style.transform = `scale(${scale})`;
+                circle.style.boxShadow = `0 0 ${glow}px rgba(255, 255, 255, ${bassLevel / 255 * 0.5})`;
+            }
 
-            // Detect bass drop (sudden spike)
+            // Detect bass drop (sudden spike or sustained high bass)
             const now = Date.now();
             const bassJump = bassLevel - prevBassLevel;
 
-            if (bassLevel > bassDropThreshold && bassJump > 60 && now - lastBassHit > 300) {
+            // Trigger on: big jump OR sustained high level
+            const isBassSpike = bassJump > 25;
+            const isHighBass = bassLevel > bassDropThreshold;
+            const cooldownPassed = now - lastBassHit > 250;
+
+            if (isHighBass && isBassSpike && cooldownPassed) {
                 triggerBassEffect();
                 lastBassHit = now;
             }
@@ -541,6 +549,11 @@
 
         function triggerBassEffect() {
             bassDropCount++;
+            isAnimating = true;
+
+            // Clear any existing inline transform so animation can take over
+            circle.style.transform = '';
+            circle.style.boxShadow = '';
 
             // Alternate between different intense effects
             const effectType = bassDropCount % 4;
@@ -548,11 +561,17 @@
             if (effectType === 0) {
                 // Intense glitch with color shift
                 circle.classList.add('bass-drop');
-                setTimeout(() => circle.classList.remove('bass-drop'), 250);
+                setTimeout(() => {
+                    circle.classList.remove('bass-drop');
+                    isAnimating = false;
+                }, 250);
             } else if (effectType === 1) {
                 // Shatter effect
                 circle.classList.add('shatter');
-                setTimeout(() => circle.classList.remove('shatter'), 300);
+                setTimeout(() => {
+                    circle.classList.remove('shatter');
+                    isAnimating = false;
+                }, 300);
             } else if (effectType === 2) {
                 // Double glitch
                 circle.classList.add('bass-drop');
@@ -560,14 +579,20 @@
                     circle.classList.remove('bass-drop');
                     setTimeout(() => {
                         circle.classList.add('bass-drop');
-                        setTimeout(() => circle.classList.remove('bass-drop'), 250);
+                        setTimeout(() => {
+                            circle.classList.remove('bass-drop');
+                            isAnimating = false;
+                        }, 250);
                     }, 50);
                 }, 150);
             } else {
                 // Ghost ring expansion with glitch
                 circle.classList.add('bass-drop');
                 spawnGhostRing();
-                setTimeout(() => circle.classList.remove('bass-drop'), 250);
+                setTimeout(() => {
+                    circle.classList.remove('bass-drop');
+                    isAnimating = false;
+                }, 250);
             }
 
             // Screen flash - sometimes red
