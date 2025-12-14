@@ -240,6 +240,18 @@
             justify-content: center;
         }
 
+        .radial-visualizer {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+        }
+
+        .radial-visualizer canvas {
+            width: 100%;
+            height: 100%;
+        }
+
         .circle-ethereal {
             position: absolute;
             width: 240px;
@@ -667,6 +679,9 @@
         <div class="subtitle">w imię miłości</div>
 
         <div class="visualizer-container">
+            <div class="radial-visualizer">
+                <canvas id="visualizerCanvas"></canvas>
+            </div>
             <div class="circle-ethereal"></div>
             <div class="circle-outer"></div>
             <div class="circle"></div>
@@ -943,6 +958,164 @@
         let lastWhisperTime = 0;
         let lastPetalTime = 0;
 
+        // ===== RADIAL VISUALIZER SETUP =====
+        const visualizerCanvas = document.getElementById('visualizerCanvas');
+        const visCtx = visualizerCanvas.getContext('2d');
+        const NUM_BARS = 64;  // Number of frequency bars
+        const BAR_WIDTH_RATIO = 0.6;  // Width of each bar relative to segment
+        const MIN_BAR_HEIGHT = 2;
+        const MAX_BAR_HEIGHT = 60;
+        const INNER_RADIUS = 70;  // Start of bars (just outside inner circle)
+        const SMOOTHING = 0.7;  // Smoothing factor for bar animations
+        let barHeights = new Array(NUM_BARS).fill(0);
+        let targetHeights = new Array(NUM_BARS).fill(0);
+
+        function initVisualizerCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const size = 300;
+            visualizerCanvas.width = size * dpr;
+            visualizerCanvas.height = size * dpr;
+            visCtx.scale(dpr, dpr);
+        }
+        initVisualizerCanvas();
+        window.addEventListener('resize', initVisualizerCanvas);
+
+        function drawRadialVisualizer() {
+            const width = 300;
+            const height = 300;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Clear canvas
+            visCtx.clearRect(0, 0, width, height);
+
+            // Idle animation when not playing
+            if (!isPlaying || !analyser) {
+                const time = Date.now() / 1000;
+                for (let i = 0; i < NUM_BARS; i++) {
+                    // Gentle wave pattern for idle state
+                    const wave = Math.sin(time * 0.5 + i * 0.15) * 0.5 + 0.5;
+                    targetHeights[i] = MIN_BAR_HEIGHT + wave * 8;
+                }
+                // Smooth the bar heights for idle state too
+                for (let i = 0; i < NUM_BARS; i++) {
+                    barHeights[i] += (targetHeights[i] - barHeights[i]) * 0.1;
+                }
+                drawBars(centerX, centerY, false);
+                return;
+            }
+
+            // Get frequency data
+            analyser.getByteFrequencyData(dataArray);
+
+            // Map frequency data to bars (use lower frequencies more prominently)
+            const binCount = analyser.frequencyBinCount;
+            for (let i = 0; i < NUM_BARS; i++) {
+                // Use logarithmic scale to emphasize lower frequencies (where the bass is)
+                const freqIndex = Math.floor(Math.pow(i / NUM_BARS, 1.5) * binCount * 0.5);
+                const value = dataArray[Math.min(freqIndex, binCount - 1)];
+                targetHeights[i] = MIN_BAR_HEIGHT + (value / 255) * (MAX_BAR_HEIGHT - MIN_BAR_HEIGHT);
+            }
+
+            // Smooth the bar heights
+            for (let i = 0; i < NUM_BARS; i++) {
+                barHeights[i] += (targetHeights[i] - barHeights[i]) * (1 - SMOOTHING);
+            }
+
+            drawBars(centerX, centerY, isInDrop);
+        }
+
+        function drawBars(centerX, centerY, stormMode) {
+            // Calculate bar dimensions
+            const angleStep = (Math.PI * 2) / NUM_BARS;
+            const barWidth = angleStep * BAR_WIDTH_RATIO;
+
+            // Draw bars
+            for (let i = 0; i < NUM_BARS; i++) {
+                const angle = i * angleStep - Math.PI / 2;  // Start from top
+                const barHeight = barHeights[i];
+
+                // Calculate bar position
+                const innerX = centerX + Math.cos(angle) * INNER_RADIUS;
+                const innerY = centerY + Math.sin(angle) * INNER_RADIUS;
+                const outerX = centerX + Math.cos(angle) * (INNER_RADIUS + barHeight);
+                const outerY = centerY + Math.sin(angle) * (INNER_RADIUS + barHeight);
+
+                // Create gradient for the bar
+                const gradient = visCtx.createLinearGradient(innerX, innerY, outerX, outerY);
+
+                if (stormMode) {
+                    // Storm mode - romantic red/pink glow
+                    gradient.addColorStop(0, 'rgba(180, 80, 100, 0.9)');
+                    gradient.addColorStop(0.5, 'rgba(200, 100, 120, 0.7)');
+                    gradient.addColorStop(1, 'rgba(220, 140, 160, 0.4)');
+                } else {
+                    // Normal mode - subtle ethereal white/purple
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                    gradient.addColorStop(0.5, 'rgba(200, 180, 220, 0.4)');
+                    gradient.addColorStop(1, 'rgba(180, 160, 200, 0.2)');
+                }
+
+                visCtx.save();
+                visCtx.translate(centerX, centerY);
+                visCtx.rotate(angle);
+
+                // Draw the bar as a rounded rectangle
+                const barWidthPx = Math.sin(barWidth / 2) * INNER_RADIUS * 2;
+                visCtx.fillStyle = gradient;
+
+                // Add glow effect
+                if (stormMode) {
+                    visCtx.shadowColor = 'rgba(180, 80, 100, 0.8)';
+                    visCtx.shadowBlur = 15 + (barHeight / MAX_BAR_HEIGHT) * 10;
+                } else {
+                    visCtx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+                    visCtx.shadowBlur = 5;
+                }
+
+                // Draw bar
+                visCtx.beginPath();
+                visCtx.roundRect(
+                    INNER_RADIUS,
+                    -barWidthPx / 2,
+                    barHeight,
+                    barWidthPx,
+                    [0, barWidthPx / 3, barWidthPx / 3, 0]
+                );
+                visCtx.fill();
+
+                // Mirror effect - draw mirrored bar on inside (shorter)
+                const mirrorHeight = barHeight * 0.35;
+                const mirrorGradient = visCtx.createLinearGradient(
+                    INNER_RADIUS - mirrorHeight, 0,
+                    INNER_RADIUS, 0
+                );
+
+                if (stormMode) {
+                    mirrorGradient.addColorStop(0, 'rgba(180, 80, 100, 0.2)');
+                    mirrorGradient.addColorStop(1, 'rgba(200, 100, 120, 0.5)');
+                } else {
+                    mirrorGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+                    mirrorGradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)');
+                }
+
+                visCtx.fillStyle = mirrorGradient;
+                visCtx.shadowBlur = stormMode ? 8 : 3;
+
+                visCtx.beginPath();
+                visCtx.roundRect(
+                    INNER_RADIUS - mirrorHeight,
+                    -barWidthPx / 2 * 0.7,
+                    mirrorHeight,
+                    barWidthPx * 0.7,
+                    [barWidthPx / 4, 0, 0, barWidthPx / 4]
+                );
+                visCtx.fill();
+
+                visCtx.restore();
+            }
+        }
+
         // ===== PRE-ANALYSIS DROP DETECTION =====
         let dropMap = [];  // Array of {start: seconds, end: seconds}
         let audioBuffer = null;
@@ -1171,6 +1344,15 @@
         createLoveTexts();
         createPoetryLines();
 
+        // Start idle visualizer animation
+        function idleVisualizerLoop() {
+            if (!isPlaying) {
+                drawRadialVisualizer();
+            }
+            requestAnimationFrame(idleVisualizerLoop);
+        }
+        idleVisualizerLoop();
+
         // ===== TITLE REVEAL =====
         let titleShown = false;
         document.addEventListener('mousemove', () => {
@@ -1294,6 +1476,9 @@
 
         function animateVisuals() {
             requestAnimationFrame(animateVisuals);
+
+            // Draw radial visualizer (even when paused to show idle state)
+            drawRadialVisualizer();
 
             if (!isPlaying || !analyser) return;
 
