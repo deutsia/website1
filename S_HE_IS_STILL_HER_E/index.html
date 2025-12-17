@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>w imię miłości</title>
+    <link rel="icon" type="image/webp" href="../assets/favi.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital@0;1&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+            background: #030306;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg,
+                #0a0812 0%,
+                #070610 40%,
+                #030306 100%
+            );
+            transition: background 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+
+        body.storm .sky {
+            background: linear-gradient(180deg,
+                #1a0508 0%,
+                #120206 40%,
+                #080003 100%
+            );
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.6;
+            transition: opacity 2s ease;
+        }
+
+        body.storm .stars {
+            opacity: 0.2;
+        }
+
+        .clouds-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.35;
+            transition: opacity 2s ease, filter 2s ease;
+        }
+
+        body.storm .clouds-canvas {
+            opacity: 0.5;
+            filter: hue-rotate(-20deg) saturate(1.8) brightness(0.4);
+        }
+
+        .aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background:
+                radial-gradient(ellipse 80% 50% at 30% 20%, rgba(60, 20, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(80, 30, 60, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.5;
+            animation: aurora-drift 20s ease-in-out infinite;
+            transition: opacity 2s ease;
+        }
+
+        body.storm .aurora {
+            opacity: 0;
+        }
+
+        @keyframes aurora-drift {
+            0%, 100% { transform: translateX(-5%) rotate(-2deg); }
+            50% { transform: translateX(5%) rotate(2deg); }
+        }
+
+        .red-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse 100% 70% at 50% 40%,
+                rgba(120, 20, 40, 0.4) 0%,
+                rgba(80, 10, 30, 0.2) 30%,
+                transparent 60%
+            );
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.storm .red-glow {
+            opacity: 1;
+            animation: glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 5;
+            transition: background 2s ease;
+        }
+
+        body.storm .vignette {
+            background: radial-gradient(ellipse at center, transparent 5%, rgba(0,0,0,0.9) 100%);
+        }
+
+        .ground-fog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to top,
+                rgba(15, 15, 25, 0.5) 0%,
+                rgba(15, 15, 25, 0.2) 40%,
+                transparent 100%
+            );
+            pointer-events: none;
+            z-index: 6;
+            transition: background 2s ease;
+        }
+
+        body.storm .ground-fog {
+            background: linear-gradient(to top,
+                rgba(50, 10, 20, 0.6) 0%,
+                rgba(40, 5, 15, 0.3) 40%,
+                transparent 100%
+            );
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .title {
+            position: absolute;
+            top: 48px;
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 6px;
+            opacity: 0;
+            transition: opacity 0.8s ease, color 2s ease, text-shadow 2s ease;
+            color: rgba(255, 255, 255, 0.85);
+            font-style: italic;
+        }
+
+        .title.visible {
+            opacity: 0.95;
+        }
+
+        body.storm .title {
+            color: #d4a0a8;
+            text-shadow:
+                0 0 40px rgba(180, 80, 100, 0.5),
+                0 0 80px rgba(150, 50, 70, 0.3);
+        }
+
+        .subtitle {
+            position: absolute;
+            top: 78px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.3s;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+
+        .title.visible + .subtitle,
+        .subtitle.visible {
+            opacity: 0.5;
+        }
+
+        body.storm .subtitle {
+            color: rgba(180, 100, 120, 0.6);
+        }
+
+        .visualizer-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-outer {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            transition: transform 0.15s ease-out, border-color 2s ease, opacity 2s ease;
+            opacity: 0.5;
+        }
+
+        body.storm .circle-outer {
+            border-color: rgba(180, 80, 100, 0.3);
+            opacity: 0.8;
+        }
+
+        .circle {
+            width: 120px;
+            height: 120px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            transition: transform 0.1s ease-out, border-color 2s ease, box-shadow 2s ease, background 2s ease;
+            position: relative;
+            background: transparent;
+        }
+
+        .circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transition: background 2s ease, box-shadow 2s ease;
+        }
+
+        .circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: border-color 2s ease;
+        }
+
+        body.storm .circle {
+            border-color: rgba(200, 100, 120, 0.6);
+            background: rgba(180, 60, 80, 0.08);
+            box-shadow:
+                0 0 80px rgba(180, 60, 80, 0.4),
+                0 0 150px rgba(150, 40, 60, 0.2),
+                inset 0 0 50px rgba(180, 60, 80, 0.1);
+        }
+
+        body.storm .circle::before {
+            background: #d4a0a8;
+            box-shadow: 0 0 30px rgba(200, 100, 120, 0.8);
+        }
+
+        body.storm .circle::after {
+            border-color: rgba(180, 80, 100, 0.3);
+        }
+
+        .love-text {
+            position: fixed;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.025);
+            pointer-events: none;
+            white-space: nowrap;
+            transition: color 2s ease, text-shadow 2s ease, opacity 2s ease;
+            font-style: italic;
+        }
+
+        body.storm .love-text {
+            color: rgba(200, 120, 140, 0.35);
+            text-shadow: 0 0 20px rgba(180, 80, 100, 0.25);
+        }
+
+        .whisper {
+            position: absolute;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .whisper.visible {
+            opacity: 0.7;
+        }
+
+        body.storm .whisper {
+            color: #d4a0a8;
+            text-shadow: 0 0 20px rgba(180, 80, 100, 0.4);
+        }
+
+        .poetry-line {
+            position: fixed;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0);
+            pointer-events: none;
+            white-space: nowrap;
+            transition: color 3s ease, opacity 3s ease;
+            font-style: italic;
+            opacity: 0;
+        }
+
+        body.storm .poetry-line {
+            color: rgba(200, 140, 160, 0.4);
+            opacity: 1;
+        }
+
+        .upload-hint {
+            position: absolute;
+            bottom: 48px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            opacity: 0.3;
+            cursor: pointer;
+            transition: opacity 0.5s ease, color 2s ease;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .upload-hint:hover {
+            opacity: 0.7;
+        }
+
+        .upload-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body.storm .upload-hint {
+            color: rgba(180, 100, 120, 0.5);
+        }
+
+        #audioInput {
+            display: none;
+        }
+
+        .drag-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .drag-overlay.active {
+            display: flex;
+        }
+
+        .drag-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 5px;
+            opacity: 0.6;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .silhouette {
+            position: fixed;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 280px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 8;
+            transition: opacity 3s ease;
+        }
+
+        .silhouette-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 180px;
+            background: linear-gradient(to top,
+                #000 0%,
+                #000 60%,
+                transparent 100%
+            );
+            border-radius: 30px 30px 35px 35px;
+            clip-path: polygon(
+                30% 0%, 70% 0%,
+                75% 15%, 80% 35%,
+                75% 55%, 85% 100%,
+                15% 100%, 25% 55%,
+                20% 35%, 25% 15%
+            );
+        }
+
+        .silhouette-head {
+            position: absolute;
+            bottom: 175px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 45px;
+            background: #000;
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        .silhouette-hair {
+            position: absolute;
+            bottom: 165px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55px;
+            height: 100px;
+            background: #000;
+            border-radius: 50% 50% 40% 40%;
+            clip-path: polygon(
+                10% 30%, 50% 0%, 90% 30%,
+                100% 60%, 95% 100%,
+                5% 100%, 0% 60%
+            );
+        }
+
+        body.storm .silhouette {
+            opacity: 0.2;
+        }
+
+        .rose-petals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9;
+            overflow: hidden;
+        }
+
+        .petal {
+            position: absolute;
+            width: 12px;
+            height: 10px;
+            background: radial-gradient(ellipse at 30% 30%,
+                rgba(180, 60, 80, 0.6) 0%,
+                rgba(120, 30, 50, 0.4) 100%
+            );
+            border-radius: 50% 0% 50% 50%;
+            opacity: 0;
+            pointer-events: none;
+            filter: blur(1px);
+        }
+
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.025;
+            background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+        }
+
+        body.storm .circle {
+            animation: heartbeat 1.2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(var(--base-scale, 1)); }
+            15% { transform: scale(calc(var(--base-scale, 1) * 1.03)); }
+            30% { transform: scale(var(--base-scale, 1)); }
+            45% { transform: scale(calc(var(--base-scale, 1) * 1.02)); }
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 3, 6, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: rgba(200, 120, 140, 0.6);
+            transition: width 0.3s ease;
+        }
+
+        .loading-detail {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sky"></div>
+    <div class="stars" id="stars"></div>
+    <canvas class="clouds-canvas" id="cloudsCanvas"></canvas>
+    <div class="aurora"></div>
+    <div class="red-glow"></div>
+    <div class="vignette"></div>
+    <div class="ground-fog"></div>
+
+    <div class="silhouette">
+        <div class="silhouette-hair"></div>
+        <div class="silhouette-head"></div>
+        <div class="silhouette-body"></div>
+    </div>
+
+    <div class="rose-petals" id="petals"></div>
+    <div class="grain"></div>
+
+    <div class="container">
+        <div class="title">S/HE IS STILL HER/E</div>
+        <div class="subtitle">w imię miłości</div>
+
+        <div class="visualizer-container">
+            <div class="circle-outer"></div>
+            <div class="circle"></div>
+        </div>
+
+        <div class="upload-hint">upuść muzykę tutaj</div>
+    </div>
+
+    <div class="drag-overlay">
+        <span class="drag-text">loslassen...</span>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">analysiere die seele des liedes...</div>
+        <div class="loading-bar">
+            <div class="loading-bar-fill" id="loadingBarFill"></div>
+        </div>
+        <div class="loading-detail" id="loadingDetail">przygotowanie...</div>
+    </div>
+
+    <input type="file" id="audioInput" accept="audio/*">
+    <audio id="audio" crossorigin="anonymous"></audio>
+
+    <script>
+        // ===== STAR FIELD =====
+        const starsContainer = document.getElementById('stars');
+        function createStars() {
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.style.cssText = `
+                    position: absolute;
+                    width: ${1 + Math.random() * 2}px;
+                    height: ${1 + Math.random() * 2}px;
+                    background: rgba(255, 255, 255, ${0.3 + Math.random() * 0.5});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 60}%;
+                    animation: twinkle ${3 + Math.random() * 4}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 3}s;
+                `;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes twinkle {
+                0%, 100% { opacity: 0.3; }
+                50% { opacity: 0.8; }
+            }
+        `;
+        document.head.appendChild(style);
+        createStars();
+
+        // ===== CLOUD SYSTEM =====
+        const canvas = document.getElementById('cloudsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight * 0.6;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const clouds = [];
+        const CLOUD_COUNT = 10;
+
+        class Cloud {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.width = 200 + Math.random() * 300;
+                this.height = 50 + Math.random() * 70;
+                this.x = initial ? Math.random() * canvas.width : -this.width - 50;
+                this.y = Math.random() * canvas.height * 0.6;
+                this.speed = 0.1 + Math.random() * 0.25;
+                this.opacity = 0.12 + Math.random() * 0.18;
+                this.blur = 25 + Math.random() * 35;
+
+                this.parts = [];
+                const partCount = 4 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < partCount; i++) {
+                    this.parts.push({
+                        offsetX: (i - partCount/2) * (this.width / partCount) * 0.5,
+                        offsetY: (Math.random() - 0.5) * this.height * 0.3,
+                        width: this.width * (0.35 + Math.random() * 0.35),
+                        height: this.height * (0.5 + Math.random() * 0.5)
+                    });
+                }
+            }
+
+            update() {
+                this.x += this.speed;
+                if (this.x > canvas.width + 100) {
+                    this.reset();
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.filter = `blur(${this.blur}px)`;
+                ctx.globalAlpha = this.opacity;
+
+                this.parts.forEach(part => {
+                    ctx.beginPath();
+                    ctx.ellipse(
+                        this.x + part.offsetX,
+                        this.y + part.offsetY,
+                        part.width / 2,
+                        part.height / 2,
+                        0, 0, Math.PI * 2
+                    );
+                    ctx.fillStyle = 'rgba(160, 160, 180, 0.4)';
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < CLOUD_COUNT; i++) {
+            clouds.push(new Cloud());
+        }
+
+        function animateClouds() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            clouds.forEach(cloud => {
+                cloud.update();
+                cloud.draw(ctx);
+            });
+            requestAnimationFrame(animateClouds);
+        }
+        animateClouds();
+
+        // ===== ROSE PETALS =====
+        const petalsContainer = document.getElementById('petals');
+        let activePetals = [];
+        let isInDrop = false;
+
+        function spawnPetal() {
+            if (!isInDrop || activePetals.length > 15) return;
+
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            const startX = Math.random() * window.innerWidth;
+            const size = 8 + Math.random() * 8;
+
+            petal.style.width = size + 'px';
+            petal.style.height = size * 0.8 + 'px';
+            petal.style.left = startX + 'px';
+            petal.style.top = '-20px';
+            petal.style.opacity = '0';
+            petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+            petalsContainer.appendChild(petal);
+            activePetals.push(petal);
+
+            let y = -20;
+            let x = startX;
+            let rotation = Math.random() * 360;
+            const fallSpeed = 0.8 + Math.random() * 1.2;
+            const swaySpeed = 0.02 + Math.random() * 0.02;
+            const swayAmount = 30 + Math.random() * 40;
+            let time = Math.random() * 100;
+
+            function animatePetal() {
+                if (!isInDrop || y > window.innerHeight + 20) {
+                    petal.remove();
+                    activePetals = activePetals.filter(p => p !== petal);
+                    return;
+                }
+
+                time += swaySpeed;
+                y += fallSpeed;
+                x = startX + Math.sin(time) * swayAmount;
+                rotation += 0.5;
+
+                const progress = y / window.innerHeight;
+                const opacity = progress < 0.1 ? progress * 5 : (progress > 0.8 ? (1 - progress) * 5 : 0.5);
+
+                petal.style.transform = `translate(${x - startX}px, ${y}px) rotate(${rotation}deg)`;
+                petal.style.opacity = opacity;
+
+                requestAnimationFrame(animatePetal);
+            }
+
+            animatePetal();
+        }
+
+        // ===== ROMANTIC FRAGMENTS - GERMAN & POLISH =====
+
+        const loveFragments = [
+            'w imię miłości',
+            'im Namen der Liebe',
+            'miłość',
+            'Liebe',
+            'tęsknota',
+            'Sehnsucht',
+            'serce',
+            'Herz',
+            'dusza',
+            'Seele',
+            'na zawsze',
+            'für immer',
+            'kocham cię',
+            'ich liebe dich'
+        ];
+
+        const whispers = [
+            // Polish
+            'ona wciąż tu jest',
+            'nie odchodź',
+            'zostań',
+            'pamiętam',
+            'twoje oczy',
+            'w ciemności',
+            'tylko ty',
+            'na zawsze',
+            'moja dusza',
+            'wróć do mnie',
+            'tęsknię',
+            'przy tobie',
+            // German
+            'sie ist noch hier',
+            'geh nicht',
+            'bleib bei mir',
+            'ich erinnere mich',
+            'deine Augen',
+            'in der Dunkelheit',
+            'nur du',
+            'für immer',
+            'meine Seele',
+            'komm zurück',
+            'ich vermisse dich',
+            'bei dir'
+        ];
+
+        const poetryLines = [
+            // Polish poetry (Mickiewicz-inspired)
+            'litwo, ojczyzno moja',
+            'ty jesteś jak zdrowie',
+            'ile cię trzeba cenić',
+            'ten tylko się dowie',
+            // German poetry (Rilke/Goethe-inspired)
+            'wer jetzt kein Haus hat',
+            'baut sich keines mehr',
+            'wer jetzt allein ist',
+            'wird es lange bleiben'
+        ];
+
+        // ===== DOM ELEMENTS =====
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let audio = document.getElementById('audio');
+        let circle = document.querySelector('.circle');
+        let circleOuter = document.querySelector('.circle-outer');
+        let title = document.querySelector('.title');
+        let subtitle = document.querySelector('.subtitle');
+        let uploadHint = document.querySelector('.upload-hint');
+        let dragOverlay = document.querySelector('.drag-overlay');
+        let audioInput = document.getElementById('audioInput');
+        let container = document.querySelector('.container');
+        let loadingOverlay = document.getElementById('loadingOverlay');
+        let loadingBarFill = document.getElementById('loadingBarFill');
+        let loadingDetail = document.getElementById('loadingDetail');
+
+        let isPlaying = false;
+        let loveTexts = [];
+        let lastWhisperTime = 0;
+        let lastPetalTime = 0;
+
+        // ===== PRE-ANALYSIS DROP DETECTION =====
+        let dropMap = [];  // Array of {start: seconds, end: seconds}
+        let audioBuffer = null;
+
+        // Analysis parameters
+        const CHUNK_DURATION = 0.05;  // 50ms chunks for analysis
+        const DROP_ENERGY_THRESHOLD = 2.5;  // Must be 2.5x the rolling average
+        const DROP_ABSOLUTE_THRESHOLD = 0.15;  // Minimum absolute energy
+        const MIN_DROP_DURATION = 1.5;  // Minimum 1.5 seconds for a drop
+        const DROP_MERGE_GAP = 0.5;  // Merge drops within 0.5 seconds
+        const DIP_DETECTION_WINDOW = 0.3;  // Look for dip 300ms before spike
+        const DIP_THRESHOLD = 0.4;  // Energy must dip to 40% for buildup detection
+
+        async function analyzeAudioForDrops(arrayBuffer) {
+            loadingDetail.textContent = 'dekodowanie dźwięku...';
+            loadingBarFill.style.width = '10%';
+
+            // Create offline context for analysis
+            const offlineCtx = new OfflineAudioContext(1, 1, 44100);
+            const tempBuffer = await offlineCtx.decodeAudioData(arrayBuffer.slice(0));
+
+            const sampleRate = tempBuffer.sampleRate;
+            const duration = tempBuffer.duration;
+            const channelData = tempBuffer.getChannelData(0);
+
+            loadingDetail.textContent = 'analysiere frequenzen...';
+            loadingBarFill.style.width = '25%';
+
+            // Calculate energy in chunks
+            const chunkSize = Math.floor(sampleRate * CHUNK_DURATION);
+            const numChunks = Math.floor(channelData.length / chunkSize);
+            const energyData = [];
+            const lowFreqEnergy = [];
+
+            // We'll use a simple low-pass approximation by averaging
+            // For better accuracy, we'd use FFT, but this is faster
+            for (let i = 0; i < numChunks; i++) {
+                const start = i * chunkSize;
+                const end = start + chunkSize;
+
+                let sum = 0;
+                let lowSum = 0;
+                let prevSample = 0;
+
+                for (let j = start; j < end; j++) {
+                    const sample = channelData[j];
+                    sum += sample * sample;
+
+                    // Simple low-pass filter approximation
+                    // Accumulate when signal is changing slowly (low freq)
+                    const diff = Math.abs(sample - prevSample);
+                    if (diff < 0.1) {
+                        lowSum += sample * sample;
+                    }
+                    prevSample = sample;
+                }
+
+                energyData.push(Math.sqrt(sum / chunkSize));
+                lowFreqEnergy.push(Math.sqrt(lowSum / chunkSize));
+
+                // Update progress
+                if (i % 100 === 0) {
+                    const progress = 25 + (i / numChunks) * 50;
+                    loadingBarFill.style.width = progress + '%';
+                    await new Promise(r => setTimeout(r, 0));  // Allow UI update
+                }
+            }
+
+            loadingDetail.textContent = 'szukam momentów ekstazy...';
+            loadingBarFill.style.width = '80%';
+
+            // Calculate rolling average for comparison
+            const windowSize = Math.floor(2 / CHUNK_DURATION);  // 2 second window
+            const rollingAvg = [];
+
+            for (let i = 0; i < energyData.length; i++) {
+                const start = Math.max(0, i - windowSize);
+                const end = Math.min(energyData.length, i + windowSize);
+                let sum = 0;
+                for (let j = start; j < end; j++) {
+                    sum += lowFreqEnergy[j];
+                }
+                rollingAvg.push(sum / (end - start));
+            }
+
+            // Detect drops using pattern matching
+            const candidates = [];
+            const dipWindow = Math.floor(DIP_DETECTION_WINDOW / CHUNK_DURATION);
+
+            for (let i = dipWindow; i < energyData.length - 1; i++) {
+                const currentEnergy = lowFreqEnergy[i];
+                const avgEnergy = rollingAvg[i];
+                const ratio = currentEnergy / Math.max(avgEnergy, 0.001);
+
+                // Check for the dip-then-spike pattern
+                let hasDip = false;
+                const lookbackStart = Math.max(0, i - dipWindow);
+                let minInWindow = Infinity;
+
+                for (let j = lookbackStart; j < i; j++) {
+                    minInWindow = Math.min(minInWindow, lowFreqEnergy[j]);
+                }
+
+                // Dip detected if minimum in lookback window is significantly lower
+                if (minInWindow < avgEnergy * DIP_THRESHOLD) {
+                    hasDip = true;
+                }
+
+                // Spike detection - must be significantly above average
+                const isSpike = ratio > DROP_ENERGY_THRESHOLD && currentEnergy > DROP_ABSOLUTE_THRESHOLD;
+
+                // Also detect sustained high energy even without dip
+                const isSustainedHigh = ratio > DROP_ENERGY_THRESHOLD * 0.8 &&
+                                        currentEnergy > DROP_ABSOLUTE_THRESHOLD * 1.2;
+
+                if (isSpike && (hasDip || isSustainedHigh)) {
+                    candidates.push({
+                        time: i * CHUNK_DURATION,
+                        energy: currentEnergy,
+                        ratio: ratio,
+                        hasDip: hasDip
+                    });
+                }
+            }
+
+            loadingDetail.textContent = 'tworzę mapę emocji...';
+            loadingBarFill.style.width = '90%';
+
+            // Convert candidates to drop regions
+            dropMap = [];
+            let currentDrop = null;
+
+            for (const candidate of candidates) {
+                if (!currentDrop) {
+                    currentDrop = { start: candidate.time, end: candidate.time + CHUNK_DURATION };
+                } else if (candidate.time - currentDrop.end < DROP_MERGE_GAP) {
+                    // Extend current drop
+                    currentDrop.end = candidate.time + CHUNK_DURATION;
+                } else {
+                    // Save current drop if long enough
+                    if (currentDrop.end - currentDrop.start >= MIN_DROP_DURATION) {
+                        dropMap.push(currentDrop);
+                    }
+                    currentDrop = { start: candidate.time, end: candidate.time + CHUNK_DURATION };
+                }
+            }
+
+            // Don't forget the last drop
+            if (currentDrop && currentDrop.end - currentDrop.start >= MIN_DROP_DURATION) {
+                dropMap.push(currentDrop);
+            }
+
+            // Post-process: extend drops slightly for smoother transitions
+            dropMap = dropMap.map(drop => ({
+                start: Math.max(0, drop.start - 0.2),
+                end: Math.min(duration, drop.end + 0.5)
+            }));
+
+            loadingBarFill.style.width = '100%';
+            loadingDetail.textContent = `znaleziono ${dropMap.length} momentów...`;
+
+            console.log('Drop map:', dropMap);
+
+            await new Promise(r => setTimeout(r, 500));
+
+            return dropMap;
+        }
+
+        function isInDropZone(currentTime) {
+            for (const drop of dropMap) {
+                if (currentTime >= drop.start && currentTime <= drop.end) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ===== SCATTER ROMANTIC TEXTS =====
+        function createLoveTexts() {
+            const positions = [
+                { x: 6, y: 12 },
+                { x: 82, y: 8 },
+                { x: 90, y: 35 },
+                { x: 4, y: 45 },
+                { x: 94, y: 60 },
+                { x: 8, y: 75 },
+                { x: 75, y: 85 },
+                { x: 35, y: 92 },
+                { x: 52, y: 6 },
+                { x: 2, y: 28 },
+                { x: 88, y: 78 },
+                { x: 20, y: 65 },
+                { x: 65, y: 25 },
+                { x: 45, y: 88 }
+            ];
+
+            positions.forEach((pos, i) => {
+                const el = document.createElement('div');
+                el.className = 'love-text';
+                el.textContent = loveFragments[i % loveFragments.length];
+                el.style.left = pos.x + '%';
+                el.style.top = pos.y + '%';
+                el.style.transform = `rotate(${(Math.random() - 0.5) * 20}deg)`;
+                document.body.appendChild(el);
+                loveTexts.push(el);
+            });
+        }
+
+        function createPoetryLines() {
+            const positions = [
+                { x: 15, y: 20 },
+                { x: 70, y: 75 },
+                { x: 25, y: 55 }
+            ];
+
+            positions.forEach((pos, i) => {
+                const el = document.createElement('div');
+                el.className = 'poetry-line';
+                el.textContent = poetryLines[i % poetryLines.length];
+                el.style.left = pos.x + '%';
+                el.style.top = pos.y + '%';
+                document.body.appendChild(el);
+            });
+        }
+
+        createLoveTexts();
+        createPoetryLines();
+
+        // ===== TITLE REVEAL =====
+        let titleShown = false;
+        document.addEventListener('mousemove', () => {
+            if (!titleShown) {
+                title.classList.add('visible');
+                titleShown = true;
+                setTimeout(() => {
+                    if (!isPlaying) {
+                        title.classList.remove('visible');
+                    }
+                }, 4000);
+            }
+        });
+
+        // ===== FILE INPUT =====
+        uploadHint.addEventListener('click', () => {
+            audioInput.click();
+        });
+
+        audioInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                loadAudio(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragOverlay.classList.add('active');
+        });
+
+        document.addEventListener('dragleave', (e) => {
+            if (e.relatedTarget === null) {
+                dragOverlay.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragOverlay.classList.remove('active');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                loadAudio(file);
+            }
+        });
+
+        async function loadAudio(file) {
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            loadingBarFill.style.width = '0%';
+            loadingDetail.textContent = 'przygotowanie...';
+
+            try {
+                // Read file as ArrayBuffer
+                const arrayBuffer = await file.arrayBuffer();
+
+                // Pre-analyze the audio for drops
+                await analyzeAudioForDrops(arrayBuffer.slice(0));
+
+                // Create blob URL for playback
+                const blob = new Blob([arrayBuffer], { type: file.type });
+                const url = URL.createObjectURL(blob);
+                audio.src = url;
+
+                if (!audioContext) {
+                    initAudio();
+                }
+
+                // Reset state
+                isInDrop = false;
+
+                // Hide loading, start playback
+                loadingOverlay.classList.remove('active');
+
+                audio.play().then(() => {
+                    isPlaying = true;
+                    uploadHint.classList.add('hidden');
+                    title.classList.add('visible');
+                });
+
+            } catch (error) {
+                console.error('Error loading audio:', error);
+                loadingDetail.textContent = 'błąd ładowania...';
+                setTimeout(() => {
+                    loadingOverlay.classList.remove('active');
+                }, 2000);
+            }
+        }
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            analyser.smoothingTimeConstant = 0.5;
+
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            animateVisuals();
+        }
+
+        function getSubBass() {
+            let sum = 0;
+            for (let i = 1; i <= 6; i++) {
+                sum += dataArray[i];
+            }
+            return sum / 6;
+        }
+
+        function getBass() {
+            let sum = 0;
+            for (let i = 7; i <= 20; i++) {
+                sum += dataArray[i];
+            }
+            return sum / 14;
+        }
+
+        function animateVisuals() {
+            requestAnimationFrame(animateVisuals);
+
+            if (!isPlaying || !analyser) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            const now = Date.now();
+
+            const subBass = getSubBass();
+            const bass = getBass();
+            const lowEnergy = (subBass * 2 + bass) / 3;
+
+            // Scale circle based on current audio
+            const baseScale = 1 + (lowEnergy / 255) * 0.8;
+            circle.style.setProperty('--base-scale', baseScale);
+            if (!isInDrop) {
+                circle.style.transform = `scale(${baseScale})`;
+            }
+            circleOuter.style.transform = `scale(${1 + (lowEnergy / 255) * 0.4})`;
+
+            // Check drop map for current position
+            const currentTime = audio.currentTime;
+            const shouldBeInDrop = isInDropZone(currentTime);
+
+            if (shouldBeInDrop && !isInDrop) {
+                enterDrop();
+            } else if (!shouldBeInDrop && isInDrop) {
+                exitDrop();
+            }
+
+            // Spawn effects during drop
+            if (isInDrop) {
+                if (now - lastWhisperTime > 800 && Math.random() > 0.65) {
+                    spawnWhisper();
+                    lastWhisperTime = now;
+                }
+
+                if (now - lastPetalTime > 300 && Math.random() > 0.5) {
+                    spawnPetal();
+                    lastPetalTime = now;
+                }
+            }
+        }
+
+        function enterDrop() {
+            isInDrop = true;
+            document.body.classList.add('storm');
+            title.classList.add('visible');
+            subtitle.classList.add('visible');
+        }
+
+        function exitDrop() {
+            isInDrop = false;
+            document.body.classList.remove('storm');
+            subtitle.classList.remove('visible');
+        }
+
+        function spawnWhisper() {
+            const whisper = document.createElement('div');
+            whisper.className = 'whisper';
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 120 + Math.random() * 120;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+
+            whisper.style.left = `calc(50% + ${x}px)`;
+            whisper.style.top = `calc(50% + ${y}px)`;
+            whisper.style.transform = `translate(-50%, -50%) rotate(${(Math.random() - 0.5) * 12}deg)`;
+
+            container.appendChild(whisper);
+
+            setTimeout(() => whisper.classList.add('visible'), 50);
+
+            setTimeout(() => {
+                whisper.classList.remove('visible');
+                setTimeout(() => whisper.remove(), 1200);
+            }, 2500 + Math.random() * 1500);
+        }
+
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            title.classList.remove('visible');
+            subtitle.classList.remove('visible');
+            uploadHint.classList.remove('hidden');
+            exitDrop();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && audio.src) {
+                e.preventDefault();
+                if (audio.paused) {
+                    audio.play();
+                    isPlaying = true;
+                } else {
+                    audio.pause();
+                    isPlaying = false;
+                }
+            }
+        });
+
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
