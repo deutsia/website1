@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>S/HE IS STILL HER/E</title>
     <link rel="icon" type="image/webp" href="./img/favi.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -519,7 +519,7 @@
 
     <div class="container">
         <div class="title">S/HE IS STILL HER/E</div>
-        <div class="subtitle">im Namen der Liebe</div>
+
 
         <div class="visualizer-container">
         </div>
@@ -543,40 +543,28 @@
     <audio id="audio" crossorigin="anonymous"></audio>
 
     <script>
-        const Config = {
-            temporalSmoothing: 0.1,
-            minDecibels: -70,
-            maxDecibels: -30,
-            fftSize: 8192,
-            startBin: 8,
-            keepBins: 40,
-            sensitivityExponent: 0.5,
-            bassAttenuationStart: 12,
-            bassAttenuationFactor: 0.4,
-            smoothingPasses: 1,
-            smoothingPoints: 3,
-            spectrumHeightScalar: 0.2,
-            glowRadius: 15,
-            minEmblemSize: 130,
-            maxEmblemSize: 220,
-            spectrumCount: 6,
-            exponents: [1, 1.12, 1.20, 1.30, 1.40, 1.50],
-            smoothMargins: [0, 2, 2, 3, 4, 5],
-            delays: [0, 1, 2, 3, 4, 5]
+        const vis = {
+            decay: 0.1,
+            dbFloor: -70,
+            dbCeil: -30,
+            resolution: 8192,
+            freqStart: 8,
+            freqBands: 40,
+            lowCutoff: 12,
+            lowGain: 0.4,
+            filterPasses: 1,
+            filterWidth: 3,
+            amplitude: 0.2,
+            coreMin: 130,
+            coreMax: 220,
+            rings: 6,
+            curve: [1, 1.12, 1.20, 1.30, 1.40, 1.50],
+            blur: [0, 2, 2, 3, 4, 5],
+            offset: [0, 1, 2, 3, 4, 5]
         };
 
-        const HALF_PI = Math.PI / 2;
-        const TWO_PI = Math.PI * 2;
-
-        function getResolutionMultiplier() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            return width >= height ? width / 1920 : height / 1080;
-        }
-
-        function random(min, max) {
-            return Math.random() * (max - min) + min;
-        }
+        const PI_HALF = Math.PI * 0.5;
+        const PI_2 = Math.PI * 2;
 
         const starsContainer = document.getElementById('stars');
         function createStars() {
@@ -703,164 +691,138 @@
         const loadingBarFill = document.getElementById('loadingBarFill');
         const loadingDetail = document.getElementById('loadingDetail');
 
-        const spectrumCanvas = document.getElementById('spectrumCanvas');
-        const spectrumCtx = spectrumCanvas.getContext('2d');
-        let spectrumCache = [];
-        const maxBufferSize = Math.max(...Config.delays) + 1;
+        const waveCanvas = document.getElementById('spectrumCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+        let frameHistory = [];
+        const historyLen = Math.max(...vis.offset) + 1;
 
-        function resizeSpectrumCanvas() {
-            spectrumCanvas.width = window.innerWidth;
-            spectrumCanvas.height = window.innerHeight;
+        function resizeWaveCanvas() {
+            waveCanvas.width = window.innerWidth;
+            waveCanvas.height = window.innerHeight;
         }
-        resizeSpectrumCanvas();
-        window.addEventListener('resize', resizeSpectrumCanvas);
+        resizeWaveCanvas();
+        window.addEventListener('resize', resizeWaveCanvas);
 
         let isPlaying = false;
 
-        function transformSpectrum(spectrum) {
-            let subArr = spectrum.slice(Config.startBin, Config.startBin + Config.keepBins);
-            subArr = savitskyGolaySmooth(subArr);
-            return subArr;
+        function extractBands(raw) {
+            let bands = raw.slice(vis.freqStart, vis.freqStart + vis.freqBands);
+            return applyFilter(bands);
         }
 
-        function calculateMultiplier(spectrum) {
-            let sum = 0;
-            const len = spectrum.length;
-            const bassEnd = Config.bassAttenuationStart - Config.startBin;
-            const bassFactor = Config.bassAttenuationFactor;
+        function getIntensity(bands) {
+            let total = 0;
+            const count = bands.length;
+            const lowEnd = vis.lowCutoff - vis.freqStart;
 
-            for (let i = 0; i < len; i++) {
-                let weight = 1.0;
-                if (i < bassEnd) {
-                    weight = bassFactor + (1 - bassFactor) * (i / bassEnd);
+            for (let i = 0; i < count; i++) {
+                let w = 1.0;
+                if (i < lowEnd) {
+                    w = vis.lowGain + (1 - vis.lowGain) * (i / lowEnd);
                 }
-                sum += spectrum[i] * weight;
+                total += bands[i] * w;
             }
 
-            let intermediate = sum / Config.keepBins / 256;
-            let compressed = Math.pow(intermediate, 0.6);
-            let boosted = 0.04 + compressed * 0.81;
-            return Math.min(1, Math.max(0, boosted));
+            let norm = total / vis.freqBands / 256;
+            let shaped = Math.pow(norm, 0.6);
+            return Math.min(1, Math.max(0, 0.04 + shaped * 0.81));
         }
 
-        function savitskyGolaySmooth(array) {
-            let lastArray = array;
-            let newArr = [];
-            for (let pass = 0; pass < Config.smoothingPasses; pass++) {
-                let sidePoints = Math.floor(Config.smoothingPoints / 2);
-                let cn = 1 / (2 * sidePoints + 1);
-                for (let i = 0; i < sidePoints; i++) {
-                    newArr[i] = lastArray[i];
-                    newArr[lastArray.length - i - 1] = lastArray[lastArray.length - i - 1];
+        function applyFilter(arr) {
+            let src = arr;
+            let out = [];
+            for (let p = 0; p < vis.filterPasses; p++) {
+                let half = Math.floor(vis.filterWidth / 2);
+                let coef = 1 / (2 * half + 1);
+                for (let i = 0; i < half; i++) {
+                    out[i] = src[i];
+                    out[src.length - i - 1] = src[src.length - i - 1];
                 }
-                for (let i = sidePoints; i < lastArray.length - sidePoints; i++) {
-                    let sum = 0;
-                    for (let n = -sidePoints; n <= sidePoints; n++) {
-                        sum += cn * lastArray[i + n] + n;
+                for (let i = half; i < src.length - half; i++) {
+                    let acc = 0;
+                    for (let k = -half; k <= half; k++) {
+                        acc += coef * src[i + k] + k;
                     }
-                    newArr[i] = sum;
+                    out[i] = acc;
                 }
-                lastArray = newArr;
+                src = out;
             }
-            return newArr;
+            return out;
         }
 
-        function calcRadius(multiplier) {
-            const minSize = Config.minEmblemSize;
-            const maxSize = Config.maxEmblemSize;
-            const scalar = multiplier * (maxSize - minSize) + minSize;
-            return scalar / 2;
+        function getCoreRadius(intensity) {
+            return (intensity * (vis.coreMax - vis.coreMin) + vis.coreMin) / 2;
         }
 
-        function smoothSpectrum(points, margin) {
-            if (margin === 0) return points;
-
-            const newArr = [];
-            for (let i = 0; i < points.length; i++) {
-                let sum = 0;
-                let denom = 0;
-                for (let j = 0; j <= margin; j++) {
-                    if (i - j < 0 || i + j > points.length - 1) break;
-                    sum += points[i - j] + points[i + j];
-                    denom += (margin - j + 1) * 2;
+        function blendBands(data, radius) {
+            if (radius === 0) return data;
+            const result = [];
+            for (let i = 0; i < data.length; i++) {
+                let acc = 0, weight = 0;
+                for (let j = 0; j <= radius; j++) {
+                    if (i - j < 0 || i + j > data.length - 1) break;
+                    acc += data[i - j] + data[i + j];
+                    weight += (radius - j + 1) * 2;
                 }
-                newArr[i] = sum / denom;
+                result[i] = acc / weight;
             }
-            return newArr;
+            return result;
         }
 
-        function drawSpectrum(spectrum, multiplier) {
-            const ctx = spectrumCtx;
-            const halfWidth = window.innerWidth / 2;
-            const halfHeight = window.innerHeight / 2;
+        function renderWave(bands, intensity) {
+            const ctx = waveCtx;
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
 
-            if (spectrumCache.length >= maxBufferSize) {
-                spectrumCache.shift();
-            }
-            spectrumCache.push(spectrum);
+            if (frameHistory.length >= historyLen) frameHistory.shift();
+            frameHistory.push(bands);
 
-            const curRad = calcRadius(multiplier);
-            const minWaveHeight = 2;
-            const maxWaveHeight = 100;
+            const baseRadius = getCoreRadius(intensity);
+            const opacities = [0.025, 0.022, 0.02, 0.028, 0.03, 0.032];
 
-            const layerOpacities = [0.025, 0.022, 0.02, 0.028, 0.03, 0.032];
+            for (let ring = vis.rings - 1; ring >= 0; ring--) {
+                const frameIdx = Math.max(frameHistory.length - vis.offset[ring] - 1, 0);
+                const ringBands = blendBands(frameHistory[frameIdx] || bands, vis.blur[ring]);
+                const vertices = [];
+                const count = ringBands.length;
+                const ringRadius = baseRadius + ring * 3;
 
-            for (let s = Config.spectrumCount - 1; s >= 0; s--) {
-                const cacheIndex = Math.max(spectrumCache.length - Config.delays[s] - 1, 0);
-                const curSpectrum = smoothSpectrum(spectrumCache[cacheIndex] || spectrum, Config.smoothMargins[s]);
-
-                const points = [];
-                const len = curSpectrum.length;
-
-                const layerOffset = s * 3;
-                const innerRad = curRad + layerOffset;
-
-                for (let i = 0; i < len; i++) {
-                    const t = Math.PI * (i / (len - 1)) - HALF_PI;
-                    let waveHeight = Math.pow(curSpectrum[i] * Config.spectrumHeightScalar, Config.exponents[s]);
-                    waveHeight = Math.max(waveHeight, minWaveHeight);
-                    waveHeight = Math.min(waveHeight, maxWaveHeight);
-                    const r = innerRad + waveHeight;
-                    const x = r * Math.cos(t);
-                    const y = r * Math.sin(t);
-                    points.push({ x, y });
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.PI * (i / (count - 1)) - PI_HALF;
+                    let h = Math.pow(ringBands[i] * vis.amplitude, vis.curve[ring]);
+                    h = Math.max(2, Math.min(100, h));
+                    const dist = ringRadius + h;
+                    vertices.push({ x: dist * Math.cos(angle), y: dist * Math.sin(angle) });
                 }
 
-                ctx.fillStyle = `rgba(255, 255, 255, ${layerOpacities[s]})`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacities[ring]})`;
                 ctx.shadowBlur = 0;
-                drawSpectrumPoints(ctx, points, halfWidth, halfHeight, innerRad);
+                tracePath(ctx, vertices, cx, cy, ringRadius);
             }
         }
 
-        function drawSpectrumPoints(ctx, points, halfWidth, halfHeight, innerRadius) {
-            if (points.length === 0) return;
-
+        function tracePath(ctx, pts, cx, cy, inner) {
+            if (!pts.length) return;
             ctx.beginPath();
+            ctx.moveTo(cx, pts[0].y + cy);
 
-            ctx.moveTo(halfWidth, points[0].y + halfHeight);
-            const len = points.length;
-            for (let i = 1; i < len - 2; i++) {
-                const c = (points[i].x + points[i + 1].x) / 2 + halfWidth;
-                const d = (points[i].y + points[i + 1].y) / 2 + halfHeight;
-                ctx.quadraticCurveTo(points[i].x + halfWidth, points[i].y + halfHeight, c, d);
+            const n = pts.length;
+            for (let i = 1; i < n - 2; i++) {
+                const mx = (pts[i].x + pts[i + 1].x) / 2 + cx;
+                const my = (pts[i].y + pts[i + 1].y) / 2 + cy;
+                ctx.quadraticCurveTo(pts[i].x + cx, pts[i].y + cy, mx, my);
             }
-            ctx.quadraticCurveTo(
-                points[len - 2].x + halfWidth,
-                points[len - 2].y + halfHeight,
-                points[len - 1].x + halfWidth,
-                points[len - 1].y + halfHeight
-            );
+            ctx.quadraticCurveTo(pts[n - 2].x + cx, pts[n - 2].y + cy, pts[n - 1].x + cx, pts[n - 1].y + cy);
 
-            for (let i = len - 2; i >= 1; i--) {
-                const c = -(points[i].x + points[i - 1].x) / 2 + halfWidth;
-                const d = (points[i].y + points[i - 1].y) / 2 + halfHeight;
-                ctx.quadraticCurveTo(-points[i].x + halfWidth, points[i].y + halfHeight, c, d);
+            for (let i = n - 2; i >= 1; i--) {
+                const mx = -(pts[i].x + pts[i - 1].x) / 2 + cx;
+                const my = (pts[i].y + pts[i - 1].y) / 2 + cy;
+                ctx.quadraticCurveTo(-pts[i].x + cx, pts[i].y + cy, mx, my);
             }
-            ctx.quadraticCurveTo(-points[0].x + halfWidth, points[0].y + halfHeight, halfWidth, points[0].y + halfHeight);
+            ctx.quadraticCurveTo(-pts[0].x + cx, pts[0].y + cy, cx, pts[0].y + cy);
 
-            ctx.moveTo(halfWidth + innerRadius, halfHeight);
-            ctx.arc(halfWidth, halfHeight, innerRadius, 0, TWO_PI, true);
-
+            ctx.moveTo(cx + inner, cy);
+            ctx.arc(cx, cy, inner, 0, PI_2, true);
             ctx.fill();
         }
 
@@ -914,10 +876,10 @@
                 audio.src = url;
 
                 if (!audioContext) {
-                    initAudio();
+                    setupAudio();
                 }
 
-                spectrumCache = [];
+                frameHistory = [];
 
                 audio.play().then(() => {
                     isPlaying = true;
@@ -930,13 +892,13 @@
             }
         }
 
-        function initAudio() {
+        function setupAudio() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = Config.fftSize;
-            analyser.smoothingTimeConstant = Config.temporalSmoothing;
-            analyser.minDecibels = Config.minDecibels;
-            analyser.maxDecibels = Config.maxDecibels;
+            analyser.fftSize = vis.resolution;
+            analyser.smoothingTimeConstant = vis.decay;
+            analyser.minDecibels = vis.dbFloor;
+            analyser.maxDecibels = vis.dbCeil;
 
             const source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
@@ -944,28 +906,28 @@
 
             dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-            animateVisuals();
+            tick();
         }
 
-        function animateVisuals() {
-            requestAnimationFrame(animateVisuals);
+        function tick() {
+            requestAnimationFrame(tick);
 
             if (!isPlaying || !analyser) return;
 
             analyser.getByteFrequencyData(dataArray);
 
-            const spectrum = transformSpectrum(Array.from(dataArray));
-            const multiplier = calculateMultiplier(spectrum);
+            const bands = extractBands(Array.from(dataArray));
+            const intensity = getIntensity(bands);
 
-            spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-            drawSpectrum(spectrum, multiplier);
+            waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+            renderWave(bands, intensity);
         }
 
         audio.addEventListener('ended', () => {
             isPlaying = false;
             title.classList.remove('visible');
             uploadHint.classList.remove('hidden');
-            spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+            waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
         });
 
         document.addEventListener('keydown', (e) => {
