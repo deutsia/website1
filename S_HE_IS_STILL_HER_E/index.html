@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>w imię miłości</title>
-    <link rel="icon" type="image/webp" href="../assets/favi.webp">
+    <title></title>
+    <link rel="icon" type="image/webp" href="./img/favi.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -176,6 +176,16 @@
             );
         }
 
+        #spectrumCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 7;
+        }
+
         .container {
             width: 100%;
             height: 100%;
@@ -240,93 +250,6 @@
             justify-content: center;
         }
 
-        .circle-outer {
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-            transition: transform 0.15s ease-out, border-color 2s ease, opacity 2s ease;
-            opacity: 0.5;
-        }
-
-        body.storm .circle-outer {
-            border-color: rgba(180, 80, 100, 0.3);
-            opacity: 0.8;
-        }
-
-        .circle {
-            width: 120px;
-            height: 120px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 50%;
-            transition: transform 0.1s ease-out, border-color 2s ease, box-shadow 2s ease, background 2s ease;
-            position: relative;
-            background: transparent;
-        }
-
-        .circle::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            transition: background 2s ease, box-shadow 2s ease;
-        }
-
-        .circle::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transition: border-color 2s ease;
-        }
-
-        body.storm .circle {
-            border-color: rgba(200, 100, 120, 0.6);
-            background: rgba(180, 60, 80, 0.08);
-            box-shadow:
-                0 0 80px rgba(180, 60, 80, 0.4),
-                0 0 150px rgba(150, 40, 60, 0.2),
-                inset 0 0 50px rgba(180, 60, 80, 0.1);
-        }
-
-        body.storm .circle::before {
-            background: #d4a0a8;
-            box-shadow: 0 0 30px rgba(200, 100, 120, 0.8);
-        }
-
-        body.storm .circle::after {
-            border-color: rgba(180, 80, 100, 0.3);
-        }
-
-        .love-text {
-            position: fixed;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 12px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.025);
-            pointer-events: none;
-            white-space: nowrap;
-            transition: color 2s ease, text-shadow 2s ease, opacity 2s ease;
-            font-style: italic;
-        }
-
-        body.storm .love-text {
-            color: rgba(200, 120, 140, 0.35);
-            text-shadow: 0 0 20px rgba(180, 80, 100, 0.25);
-        }
-
         .whisper {
             position: absolute;
             font-family: 'Cormorant Garamond', serif;
@@ -348,25 +271,6 @@
         body.storm .whisper {
             color: #d4a0a8;
             text-shadow: 0 0 20px rgba(180, 80, 100, 0.4);
-        }
-
-        .poetry-line {
-            position: fixed;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0);
-            pointer-events: none;
-            white-space: nowrap;
-            transition: color 3s ease, opacity 3s ease;
-            font-style: italic;
-            opacity: 0;
-        }
-
-        body.storm .poetry-line {
-            color: rgba(200, 140, 160, 0.4);
-            opacity: 1;
         }
 
         .upload-hint {
@@ -532,18 +436,6 @@
             background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
         }
 
-        body.storm .circle {
-            animation: heartbeat 1.2s ease-in-out infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(var(--base-scale, 1)); }
-            15% { transform: scale(calc(var(--base-scale, 1) * 1.03)); }
-            30% { transform: scale(var(--base-scale, 1)); }
-            45% { transform: scale(calc(var(--base-scale, 1) * 1.02)); }
-        }
-
-        /* Loading overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -614,6 +506,8 @@
     <div class="vignette"></div>
     <div class="ground-fog"></div>
 
+    <canvas id="spectrumCanvas"></canvas>
+
     <div class="silhouette">
         <div class="silhouette-hair"></div>
         <div class="silhouette-head"></div>
@@ -625,14 +519,12 @@
 
     <div class="container">
         <div class="title">S/HE IS STILL HER/E</div>
-        <div class="subtitle">w imię miłości</div>
+        <div class="subtitle">im Namen der Liebe</div>
 
         <div class="visualizer-container">
-            <div class="circle-outer"></div>
-            <div class="circle"></div>
         </div>
 
-        <div class="upload-hint">upuść muzykę tutaj</div>
+        <div class="upload-hint">Musik hier ablegen</div>
     </div>
 
     <div class="drag-overlay">
@@ -640,18 +532,52 @@
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-text">analysiere die seele des liedes...</div>
+        <div class="loading-text">analysiere die Seele des Liedes...</div>
         <div class="loading-bar">
             <div class="loading-bar-fill" id="loadingBarFill"></div>
         </div>
-        <div class="loading-detail" id="loadingDetail">przygotowanie...</div>
+        <div class="loading-detail" id="loadingDetail">wird vorbereitet...</div>
     </div>
 
     <input type="file" id="audioInput" accept="audio/*">
     <audio id="audio" crossorigin="anonymous"></audio>
 
     <script>
-        // ===== STAR FIELD =====
+        const Config = {
+            temporalSmoothing: 0.1,
+            minDecibels: -70,
+            maxDecibels: -30,
+            fftSize: 8192,
+            startBin: 8,
+            keepBins: 40,
+            sensitivityExponent: 0.5,
+            bassAttenuationStart: 12,
+            bassAttenuationFactor: 0.4,
+            smoothingPasses: 1,
+            smoothingPoints: 3,
+            spectrumHeightScalar: 0.2,
+            glowRadius: 15,
+            minEmblemSize: 130,
+            maxEmblemSize: 220,
+            spectrumCount: 6,
+            exponents: [1, 1.12, 1.20, 1.30, 1.40, 1.50],
+            smoothMargins: [0, 2, 2, 3, 4, 5],
+            delays: [0, 1, 2, 3, 4, 5]
+        };
+
+        const HALF_PI = Math.PI / 2;
+        const TWO_PI = Math.PI * 2;
+
+        function getResolutionMultiplier() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            return width >= height ? width / 1920 : height / 1080;
+        }
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
         const starsContainer = document.getElementById('stars');
         function createStars() {
             for (let i = 0; i < 100; i++) {
@@ -681,16 +607,15 @@
         document.head.appendChild(style);
         createStars();
 
-        // ===== CLOUD SYSTEM =====
-        const canvas = document.getElementById('cloudsCanvas');
-        const ctx = canvas.getContext('2d');
+        const cloudsCanvas = document.getElementById('cloudsCanvas');
+        const cloudsCtx = cloudsCanvas.getContext('2d');
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight * 0.6;
+        function resizeCloudsCanvas() {
+            cloudsCanvas.width = window.innerWidth;
+            cloudsCanvas.height = window.innerHeight * 0.6;
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        resizeCloudsCanvas();
+        window.addEventListener('resize', resizeCloudsCanvas);
 
         const clouds = [];
         const CLOUD_COUNT = 10;
@@ -703,8 +628,8 @@
             reset(initial = false) {
                 this.width = 200 + Math.random() * 300;
                 this.height = 50 + Math.random() * 70;
-                this.x = initial ? Math.random() * canvas.width : -this.width - 50;
-                this.y = Math.random() * canvas.height * 0.6;
+                this.x = initial ? Math.random() * cloudsCanvas.width : -this.width - 50;
+                this.y = Math.random() * cloudsCanvas.height * 0.6;
                 this.speed = 0.1 + Math.random() * 0.25;
                 this.opacity = 0.12 + Math.random() * 0.18;
                 this.blur = 25 + Math.random() * 35;
@@ -723,7 +648,7 @@
 
             update() {
                 this.x += this.speed;
-                if (this.x > canvas.width + 100) {
+                if (this.x > cloudsCanvas.width + 100) {
                     this.reset();
                 }
             }
@@ -755,382 +680,190 @@
         }
 
         function animateClouds() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cloudsCtx.clearRect(0, 0, cloudsCanvas.width, cloudsCanvas.height);
             clouds.forEach(cloud => {
                 cloud.update();
-                cloud.draw(ctx);
+                cloud.draw(cloudsCtx);
             });
             requestAnimationFrame(animateClouds);
         }
         animateClouds();
 
-        // ===== ROSE PETALS =====
-        const petalsContainer = document.getElementById('petals');
-        let activePetals = [];
-        let isInDrop = false;
-
-        function spawnPetal() {
-            if (!isInDrop || activePetals.length > 15) return;
-
-            const petal = document.createElement('div');
-            petal.className = 'petal';
-            const startX = Math.random() * window.innerWidth;
-            const size = 8 + Math.random() * 8;
-
-            petal.style.width = size + 'px';
-            petal.style.height = size * 0.8 + 'px';
-            petal.style.left = startX + 'px';
-            petal.style.top = '-20px';
-            petal.style.opacity = '0';
-            petal.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-            petalsContainer.appendChild(petal);
-            activePetals.push(petal);
-
-            let y = -20;
-            let x = startX;
-            let rotation = Math.random() * 360;
-            const fallSpeed = 0.8 + Math.random() * 1.2;
-            const swaySpeed = 0.02 + Math.random() * 0.02;
-            const swayAmount = 30 + Math.random() * 40;
-            let time = Math.random() * 100;
-
-            function animatePetal() {
-                if (!isInDrop || y > window.innerHeight + 20) {
-                    petal.remove();
-                    activePetals = activePetals.filter(p => p !== petal);
-                    return;
-                }
-
-                time += swaySpeed;
-                y += fallSpeed;
-                x = startX + Math.sin(time) * swayAmount;
-                rotation += 0.5;
-
-                const progress = y / window.innerHeight;
-                const opacity = progress < 0.1 ? progress * 5 : (progress > 0.8 ? (1 - progress) * 5 : 0.5);
-
-                petal.style.transform = `translate(${x - startX}px, ${y}px) rotate(${rotation}deg)`;
-                petal.style.opacity = opacity;
-
-                requestAnimationFrame(animatePetal);
-            }
-
-            animatePetal();
-        }
-
-        // ===== ROMANTIC FRAGMENTS - GERMAN & POLISH =====
-
-        const loveFragments = [
-            'w imię miłości',
-            'im Namen der Liebe',
-            'miłość',
-            'Liebe',
-            'tęsknota',
-            'Sehnsucht',
-            'serce',
-            'Herz',
-            'dusza',
-            'Seele',
-            'na zawsze',
-            'für immer',
-            'kocham cię',
-            'ich liebe dich'
-        ];
-
-        const whispers = [
-            // Polish
-            'ona wciąż tu jest',
-            'nie odchodź',
-            'zostań',
-            'pamiętam',
-            'twoje oczy',
-            'w ciemności',
-            'tylko ty',
-            'na zawsze',
-            'moja dusza',
-            'wróć do mnie',
-            'tęsknię',
-            'przy tobie',
-            // German
-            'sie ist noch hier',
-            'geh nicht',
-            'bleib bei mir',
-            'ich erinnere mich',
-            'deine Augen',
-            'in der Dunkelheit',
-            'nur du',
-            'für immer',
-            'meine Seele',
-            'komm zurück',
-            'ich vermisse dich',
-            'bei dir'
-        ];
-
-        const poetryLines = [
-            // Polish poetry (Mickiewicz-inspired)
-            'litwo, ojczyzno moja',
-            'ty jesteś jak zdrowie',
-            'ile cię trzeba cenić',
-            'ten tylko się dowie',
-            // German poetry (Rilke/Goethe-inspired)
-            'wer jetzt kein Haus hat',
-            'baut sich keines mehr',
-            'wer jetzt allein ist',
-            'wird es lange bleiben'
-        ];
-
-        // ===== DOM ELEMENTS =====
         let audioContext;
         let analyser;
         let dataArray;
-        let audio = document.getElementById('audio');
-        let circle = document.querySelector('.circle');
-        let circleOuter = document.querySelector('.circle-outer');
-        let title = document.querySelector('.title');
-        let subtitle = document.querySelector('.subtitle');
-        let uploadHint = document.querySelector('.upload-hint');
-        let dragOverlay = document.querySelector('.drag-overlay');
-        let audioInput = document.getElementById('audioInput');
-        let container = document.querySelector('.container');
-        let loadingOverlay = document.getElementById('loadingOverlay');
-        let loadingBarFill = document.getElementById('loadingBarFill');
-        let loadingDetail = document.getElementById('loadingDetail');
+        const audio = document.getElementById('audio');
+        const title = document.querySelector('.title');
+        const subtitle = document.querySelector('.subtitle');
+        const uploadHint = document.querySelector('.upload-hint');
+        const dragOverlay = document.querySelector('.drag-overlay');
+        const audioInput = document.getElementById('audioInput');
+        const container = document.querySelector('.container');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingBarFill = document.getElementById('loadingBarFill');
+        const loadingDetail = document.getElementById('loadingDetail');
+
+        const spectrumCanvas = document.getElementById('spectrumCanvas');
+        const spectrumCtx = spectrumCanvas.getContext('2d');
+        let spectrumCache = [];
+        const maxBufferSize = Math.max(...Config.delays) + 1;
+
+        function resizeSpectrumCanvas() {
+            spectrumCanvas.width = window.innerWidth;
+            spectrumCanvas.height = window.innerHeight;
+        }
+        resizeSpectrumCanvas();
+        window.addEventListener('resize', resizeSpectrumCanvas);
 
         let isPlaying = false;
-        let loveTexts = [];
-        let lastWhisperTime = 0;
-        let lastPetalTime = 0;
 
-        // ===== PRE-ANALYSIS DROP DETECTION =====
-        let dropMap = [];  // Array of {start: seconds, end: seconds}
-        let audioBuffer = null;
+        function transformSpectrum(spectrum) {
+            let subArr = spectrum.slice(Config.startBin, Config.startBin + Config.keepBins);
+            subArr = savitskyGolaySmooth(subArr);
+            return subArr;
+        }
 
-        // Analysis parameters
-        const CHUNK_DURATION = 0.05;  // 50ms chunks for analysis
-        const DROP_ENERGY_THRESHOLD = 2.5;  // Must be 2.5x the rolling average
-        const DROP_ABSOLUTE_THRESHOLD = 0.15;  // Minimum absolute energy
-        const MIN_DROP_DURATION = 1.5;  // Minimum 1.5 seconds for a drop
-        const DROP_MERGE_GAP = 0.5;  // Merge drops within 0.5 seconds
-        const DIP_DETECTION_WINDOW = 0.3;  // Look for dip 300ms before spike
-        const DIP_THRESHOLD = 0.4;  // Energy must dip to 40% for buildup detection
+        function calculateMultiplier(spectrum) {
+            let sum = 0;
+            const len = spectrum.length;
+            const bassEnd = Config.bassAttenuationStart - Config.startBin;
+            const bassFactor = Config.bassAttenuationFactor;
 
-        async function analyzeAudioForDrops(arrayBuffer) {
-            loadingDetail.textContent = 'dekodowanie dźwięku...';
-            loadingBarFill.style.width = '10%';
+            for (let i = 0; i < len; i++) {
+                let weight = 1.0;
+                if (i < bassEnd) {
+                    weight = bassFactor + (1 - bassFactor) * (i / bassEnd);
+                }
+                sum += spectrum[i] * weight;
+            }
 
-            // Create offline context for analysis
-            const offlineCtx = new OfflineAudioContext(1, 1, 44100);
-            const tempBuffer = await offlineCtx.decodeAudioData(arrayBuffer.slice(0));
+            let intermediate = sum / Config.keepBins / 256;
+            let compressed = Math.pow(intermediate, 0.6);
+            let boosted = 0.04 + compressed * 0.81;
+            return Math.min(1, Math.max(0, boosted));
+        }
 
-            const sampleRate = tempBuffer.sampleRate;
-            const duration = tempBuffer.duration;
-            const channelData = tempBuffer.getChannelData(0);
-
-            loadingDetail.textContent = 'analysiere frequenzen...';
-            loadingBarFill.style.width = '25%';
-
-            // Calculate energy in chunks
-            const chunkSize = Math.floor(sampleRate * CHUNK_DURATION);
-            const numChunks = Math.floor(channelData.length / chunkSize);
-            const energyData = [];
-            const lowFreqEnergy = [];
-
-            // We'll use a simple low-pass approximation by averaging
-            // For better accuracy, we'd use FFT, but this is faster
-            for (let i = 0; i < numChunks; i++) {
-                const start = i * chunkSize;
-                const end = start + chunkSize;
-
-                let sum = 0;
-                let lowSum = 0;
-                let prevSample = 0;
-
-                for (let j = start; j < end; j++) {
-                    const sample = channelData[j];
-                    sum += sample * sample;
-
-                    // Simple low-pass filter approximation
-                    // Accumulate when signal is changing slowly (low freq)
-                    const diff = Math.abs(sample - prevSample);
-                    if (diff < 0.1) {
-                        lowSum += sample * sample;
+        function savitskyGolaySmooth(array) {
+            let lastArray = array;
+            let newArr = [];
+            for (let pass = 0; pass < Config.smoothingPasses; pass++) {
+                let sidePoints = Math.floor(Config.smoothingPoints / 2);
+                let cn = 1 / (2 * sidePoints + 1);
+                for (let i = 0; i < sidePoints; i++) {
+                    newArr[i] = lastArray[i];
+                    newArr[lastArray.length - i - 1] = lastArray[lastArray.length - i - 1];
+                }
+                for (let i = sidePoints; i < lastArray.length - sidePoints; i++) {
+                    let sum = 0;
+                    for (let n = -sidePoints; n <= sidePoints; n++) {
+                        sum += cn * lastArray[i + n] + n;
                     }
-                    prevSample = sample;
+                    newArr[i] = sum;
                 }
-
-                energyData.push(Math.sqrt(sum / chunkSize));
-                lowFreqEnergy.push(Math.sqrt(lowSum / chunkSize));
-
-                // Update progress
-                if (i % 100 === 0) {
-                    const progress = 25 + (i / numChunks) * 50;
-                    loadingBarFill.style.width = progress + '%';
-                    await new Promise(r => setTimeout(r, 0));  // Allow UI update
-                }
+                lastArray = newArr;
             }
+            return newArr;
+        }
 
-            loadingDetail.textContent = 'szukam momentów ekstazy...';
-            loadingBarFill.style.width = '80%';
+        function calcRadius(multiplier) {
+            const minSize = Config.minEmblemSize;
+            const maxSize = Config.maxEmblemSize;
+            const scalar = multiplier * (maxSize - minSize) + minSize;
+            return scalar / 2;
+        }
 
-            // Calculate rolling average for comparison
-            const windowSize = Math.floor(2 / CHUNK_DURATION);  // 2 second window
-            const rollingAvg = [];
+        function smoothSpectrum(points, margin) {
+            if (margin === 0) return points;
 
-            for (let i = 0; i < energyData.length; i++) {
-                const start = Math.max(0, i - windowSize);
-                const end = Math.min(energyData.length, i + windowSize);
+            const newArr = [];
+            for (let i = 0; i < points.length; i++) {
                 let sum = 0;
-                for (let j = start; j < end; j++) {
-                    sum += lowFreqEnergy[j];
+                let denom = 0;
+                for (let j = 0; j <= margin; j++) {
+                    if (i - j < 0 || i + j > points.length - 1) break;
+                    sum += points[i - j] + points[i + j];
+                    denom += (margin - j + 1) * 2;
                 }
-                rollingAvg.push(sum / (end - start));
+                newArr[i] = sum / denom;
             }
-
-            // Detect drops using pattern matching
-            const candidates = [];
-            const dipWindow = Math.floor(DIP_DETECTION_WINDOW / CHUNK_DURATION);
-
-            for (let i = dipWindow; i < energyData.length - 1; i++) {
-                const currentEnergy = lowFreqEnergy[i];
-                const avgEnergy = rollingAvg[i];
-                const ratio = currentEnergy / Math.max(avgEnergy, 0.001);
-
-                // Check for the dip-then-spike pattern
-                let hasDip = false;
-                const lookbackStart = Math.max(0, i - dipWindow);
-                let minInWindow = Infinity;
-
-                for (let j = lookbackStart; j < i; j++) {
-                    minInWindow = Math.min(minInWindow, lowFreqEnergy[j]);
-                }
-
-                // Dip detected if minimum in lookback window is significantly lower
-                if (minInWindow < avgEnergy * DIP_THRESHOLD) {
-                    hasDip = true;
-                }
-
-                // Spike detection - must be significantly above average
-                const isSpike = ratio > DROP_ENERGY_THRESHOLD && currentEnergy > DROP_ABSOLUTE_THRESHOLD;
-
-                // Also detect sustained high energy even without dip
-                const isSustainedHigh = ratio > DROP_ENERGY_THRESHOLD * 0.8 &&
-                                        currentEnergy > DROP_ABSOLUTE_THRESHOLD * 1.2;
-
-                if (isSpike && (hasDip || isSustainedHigh)) {
-                    candidates.push({
-                        time: i * CHUNK_DURATION,
-                        energy: currentEnergy,
-                        ratio: ratio,
-                        hasDip: hasDip
-                    });
-                }
-            }
-
-            loadingDetail.textContent = 'tworzę mapę emocji...';
-            loadingBarFill.style.width = '90%';
-
-            // Convert candidates to drop regions
-            dropMap = [];
-            let currentDrop = null;
-
-            for (const candidate of candidates) {
-                if (!currentDrop) {
-                    currentDrop = { start: candidate.time, end: candidate.time + CHUNK_DURATION };
-                } else if (candidate.time - currentDrop.end < DROP_MERGE_GAP) {
-                    // Extend current drop
-                    currentDrop.end = candidate.time + CHUNK_DURATION;
-                } else {
-                    // Save current drop if long enough
-                    if (currentDrop.end - currentDrop.start >= MIN_DROP_DURATION) {
-                        dropMap.push(currentDrop);
-                    }
-                    currentDrop = { start: candidate.time, end: candidate.time + CHUNK_DURATION };
-                }
-            }
-
-            // Don't forget the last drop
-            if (currentDrop && currentDrop.end - currentDrop.start >= MIN_DROP_DURATION) {
-                dropMap.push(currentDrop);
-            }
-
-            // Post-process: extend drops slightly for smoother transitions
-            dropMap = dropMap.map(drop => ({
-                start: Math.max(0, drop.start - 0.2),
-                end: Math.min(duration, drop.end + 0.5)
-            }));
-
-            loadingBarFill.style.width = '100%';
-            loadingDetail.textContent = `znaleziono ${dropMap.length} momentów...`;
-
-            console.log('Drop map:', dropMap);
-
-            await new Promise(r => setTimeout(r, 500));
-
-            return dropMap;
+            return newArr;
         }
 
-        function isInDropZone(currentTime) {
-            for (const drop of dropMap) {
-                if (currentTime >= drop.start && currentTime <= drop.end) {
-                    return true;
-                }
+        function drawSpectrum(spectrum, multiplier) {
+            const ctx = spectrumCtx;
+            const halfWidth = window.innerWidth / 2;
+            const halfHeight = window.innerHeight / 2;
+
+            if (spectrumCache.length >= maxBufferSize) {
+                spectrumCache.shift();
             }
-            return false;
+            spectrumCache.push(spectrum);
+
+            const curRad = calcRadius(multiplier);
+            const minWaveHeight = 2;
+            const maxWaveHeight = 100;
+
+            const layerOpacities = [0.025, 0.022, 0.02, 0.028, 0.03, 0.032];
+
+            for (let s = Config.spectrumCount - 1; s >= 0; s--) {
+                const cacheIndex = Math.max(spectrumCache.length - Config.delays[s] - 1, 0);
+                const curSpectrum = smoothSpectrum(spectrumCache[cacheIndex] || spectrum, Config.smoothMargins[s]);
+
+                const points = [];
+                const len = curSpectrum.length;
+
+                const layerOffset = s * 3;
+                const innerRad = curRad + layerOffset;
+
+                for (let i = 0; i < len; i++) {
+                    const t = Math.PI * (i / (len - 1)) - HALF_PI;
+                    let waveHeight = Math.pow(curSpectrum[i] * Config.spectrumHeightScalar, Config.exponents[s]);
+                    waveHeight = Math.max(waveHeight, minWaveHeight);
+                    waveHeight = Math.min(waveHeight, maxWaveHeight);
+                    const r = innerRad + waveHeight;
+                    const x = r * Math.cos(t);
+                    const y = r * Math.sin(t);
+                    points.push({ x, y });
+                }
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${layerOpacities[s]})`;
+                ctx.shadowBlur = 0;
+                drawSpectrumPoints(ctx, points, halfWidth, halfHeight, innerRad);
+            }
         }
 
-        // ===== SCATTER ROMANTIC TEXTS =====
-        function createLoveTexts() {
-            const positions = [
-                { x: 6, y: 12 },
-                { x: 82, y: 8 },
-                { x: 90, y: 35 },
-                { x: 4, y: 45 },
-                { x: 94, y: 60 },
-                { x: 8, y: 75 },
-                { x: 75, y: 85 },
-                { x: 35, y: 92 },
-                { x: 52, y: 6 },
-                { x: 2, y: 28 },
-                { x: 88, y: 78 },
-                { x: 20, y: 65 },
-                { x: 65, y: 25 },
-                { x: 45, y: 88 }
-            ];
+        function drawSpectrumPoints(ctx, points, halfWidth, halfHeight, innerRadius) {
+            if (points.length === 0) return;
 
-            positions.forEach((pos, i) => {
-                const el = document.createElement('div');
-                el.className = 'love-text';
-                el.textContent = loveFragments[i % loveFragments.length];
-                el.style.left = pos.x + '%';
-                el.style.top = pos.y + '%';
-                el.style.transform = `rotate(${(Math.random() - 0.5) * 20}deg)`;
-                document.body.appendChild(el);
-                loveTexts.push(el);
-            });
+            ctx.beginPath();
+
+            ctx.moveTo(halfWidth, points[0].y + halfHeight);
+            const len = points.length;
+            for (let i = 1; i < len - 2; i++) {
+                const c = (points[i].x + points[i + 1].x) / 2 + halfWidth;
+                const d = (points[i].y + points[i + 1].y) / 2 + halfHeight;
+                ctx.quadraticCurveTo(points[i].x + halfWidth, points[i].y + halfHeight, c, d);
+            }
+            ctx.quadraticCurveTo(
+                points[len - 2].x + halfWidth,
+                points[len - 2].y + halfHeight,
+                points[len - 1].x + halfWidth,
+                points[len - 1].y + halfHeight
+            );
+
+            for (let i = len - 2; i >= 1; i--) {
+                const c = -(points[i].x + points[i - 1].x) / 2 + halfWidth;
+                const d = (points[i].y + points[i - 1].y) / 2 + halfHeight;
+                ctx.quadraticCurveTo(-points[i].x + halfWidth, points[i].y + halfHeight, c, d);
+            }
+            ctx.quadraticCurveTo(-points[0].x + halfWidth, points[0].y + halfHeight, halfWidth, points[0].y + halfHeight);
+
+            ctx.moveTo(halfWidth + innerRadius, halfHeight);
+            ctx.arc(halfWidth, halfHeight, innerRadius, 0, TWO_PI, true);
+
+            ctx.fill();
         }
 
-        function createPoetryLines() {
-            const positions = [
-                { x: 15, y: 20 },
-                { x: 70, y: 75 },
-                { x: 25, y: 55 }
-            ];
-
-            positions.forEach((pos, i) => {
-                const el = document.createElement('div');
-                el.className = 'poetry-line';
-                el.textContent = poetryLines[i % poetryLines.length];
-                el.style.left = pos.x + '%';
-                el.style.top = pos.y + '%';
-                document.body.appendChild(el);
-            });
-        }
-
-        createLoveTexts();
-        createPoetryLines();
-
-        // ===== TITLE REVEAL =====
         let titleShown = false;
         document.addEventListener('mousemove', () => {
             if (!titleShown) {
@@ -1144,7 +877,6 @@
             }
         });
 
-        // ===== FILE INPUT =====
         uploadHint.addEventListener('click', () => {
             audioInput.click();
         });
@@ -1155,7 +887,6 @@
             }
         });
 
-        // Drag and drop
         document.addEventListener('dragover', (e) => {
             e.preventDefault();
             dragOverlay.classList.add('active');
@@ -1178,32 +909,15 @@
         });
 
         async function loadAudio(file) {
-            // Show loading overlay
-            loadingOverlay.classList.add('active');
-            loadingBarFill.style.width = '0%';
-            loadingDetail.textContent = 'przygotowanie...';
-
             try {
-                // Read file as ArrayBuffer
-                const arrayBuffer = await file.arrayBuffer();
-
-                // Pre-analyze the audio for drops
-                await analyzeAudioForDrops(arrayBuffer.slice(0));
-
-                // Create blob URL for playback
-                const blob = new Blob([arrayBuffer], { type: file.type });
-                const url = URL.createObjectURL(blob);
+                const url = URL.createObjectURL(file);
                 audio.src = url;
 
                 if (!audioContext) {
                     initAudio();
                 }
 
-                // Reset state
-                isInDrop = false;
-
-                // Hide loading, start playback
-                loadingOverlay.classList.remove('active');
+                spectrumCache = [];
 
                 audio.play().then(() => {
                     isPlaying = true;
@@ -1213,18 +927,16 @@
 
             } catch (error) {
                 console.error('Error loading audio:', error);
-                loadingDetail.textContent = 'błąd ładowania...';
-                setTimeout(() => {
-                    loadingOverlay.classList.remove('active');
-                }, 2000);
             }
         }
 
         function initAudio() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 2048;
-            analyser.smoothingTimeConstant = 0.5;
+            analyser.fftSize = Config.fftSize;
+            analyser.smoothingTimeConstant = Config.temporalSmoothing;
+            analyser.minDecibels = Config.minDecibels;
+            analyser.maxDecibels = Config.maxDecibels;
 
             const source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
@@ -1235,109 +947,25 @@
             animateVisuals();
         }
 
-        function getSubBass() {
-            let sum = 0;
-            for (let i = 1; i <= 6; i++) {
-                sum += dataArray[i];
-            }
-            return sum / 6;
-        }
-
-        function getBass() {
-            let sum = 0;
-            for (let i = 7; i <= 20; i++) {
-                sum += dataArray[i];
-            }
-            return sum / 14;
-        }
-
         function animateVisuals() {
             requestAnimationFrame(animateVisuals);
 
             if (!isPlaying || !analyser) return;
 
             analyser.getByteFrequencyData(dataArray);
-            const now = Date.now();
 
-            const subBass = getSubBass();
-            const bass = getBass();
-            const lowEnergy = (subBass * 2 + bass) / 3;
+            const spectrum = transformSpectrum(Array.from(dataArray));
+            const multiplier = calculateMultiplier(spectrum);
 
-            // Scale circle based on current audio
-            const baseScale = 1 + (lowEnergy / 255) * 0.8;
-            circle.style.setProperty('--base-scale', baseScale);
-            if (!isInDrop) {
-                circle.style.transform = `scale(${baseScale})`;
-            }
-            circleOuter.style.transform = `scale(${1 + (lowEnergy / 255) * 0.4})`;
-
-            // Check drop map for current position
-            const currentTime = audio.currentTime;
-            const shouldBeInDrop = isInDropZone(currentTime);
-
-            if (shouldBeInDrop && !isInDrop) {
-                enterDrop();
-            } else if (!shouldBeInDrop && isInDrop) {
-                exitDrop();
-            }
-
-            // Spawn effects during drop
-            if (isInDrop) {
-                if (now - lastWhisperTime > 800 && Math.random() > 0.65) {
-                    spawnWhisper();
-                    lastWhisperTime = now;
-                }
-
-                if (now - lastPetalTime > 300 && Math.random() > 0.5) {
-                    spawnPetal();
-                    lastPetalTime = now;
-                }
-            }
-        }
-
-        function enterDrop() {
-            isInDrop = true;
-            document.body.classList.add('storm');
-            title.classList.add('visible');
-            subtitle.classList.add('visible');
-        }
-
-        function exitDrop() {
-            isInDrop = false;
-            document.body.classList.remove('storm');
-            subtitle.classList.remove('visible');
-        }
-
-        function spawnWhisper() {
-            const whisper = document.createElement('div');
-            whisper.className = 'whisper';
-            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
-
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 120 + Math.random() * 120;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-
-            whisper.style.left = `calc(50% + ${x}px)`;
-            whisper.style.top = `calc(50% + ${y}px)`;
-            whisper.style.transform = `translate(-50%, -50%) rotate(${(Math.random() - 0.5) * 12}deg)`;
-
-            container.appendChild(whisper);
-
-            setTimeout(() => whisper.classList.add('visible'), 50);
-
-            setTimeout(() => {
-                whisper.classList.remove('visible');
-                setTimeout(() => whisper.remove(), 1200);
-            }, 2500 + Math.random() * 1500);
+            spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+            drawSpectrum(spectrum, multiplier);
         }
 
         audio.addEventListener('ended', () => {
             isPlaying = false;
             title.classList.remove('visible');
-            subtitle.classList.remove('visible');
             uploadHint.classList.remove('hidden');
-            exitDrop();
+            spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
         });
 
         document.addEventListener('keydown', (e) => {
